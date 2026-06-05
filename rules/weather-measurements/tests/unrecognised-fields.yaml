@@ -1,0 +1,6 @@
+inputs:
+  - payload: '{"voltage": 3.3}'
+    payloadFormat: json
+    topic: "devices/sensor01/data"
+    clientID: "sensor01"
+    time: "2026-01-01T12:00:00Z"

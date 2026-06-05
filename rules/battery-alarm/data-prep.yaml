@@ -1,0 +1,11 @@
+# Data Preparation rule configuration.
+
+description: "Raises an alarm when device battery drops below threshold"
+tags:
+  - example
+  - battery
+smartFunctionFile: "smartFunction.ts"
+input:
+  transport: mqtt
+  topicPattern: "devices/*/status"
+  clientIDPattern: "*"

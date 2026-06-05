@@ -1,0 +1,19 @@
+{
+  "name": "dataprep-rules",
+  "version": "1.0.0",
+  "description": "Cumulocity Data Preparation Rules - Development Template",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node scripts/test.js",
+    "deploy": "tsc --noEmit && node scripts/deploy.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
+  }
+}
