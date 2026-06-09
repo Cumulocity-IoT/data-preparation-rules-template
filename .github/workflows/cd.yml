@@ -1,0 +1,35 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Test and deploy rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run lint
+      - run: npm run validate
+      - run: npm run test
+        env:
+          C8Y_HOST: ${{ secrets.C8Y_HOST }}
+          C8Y_HEADER_AUTHORIZATION: ${{ secrets.C8Y_HEADER_AUTHORIZATION }}
+          C8Y_BASEURL: ${{ secrets.C8Y_BASEURL }}
+          C8Y_USER: ${{ secrets.C8Y_USER }}
+          C8Y_PASSWORD: ${{ secrets.C8Y_PASSWORD }}
+      - run: npm run deploy
+        env:
+          C8Y_HOST: ${{ secrets.C8Y_HOST }}
+          C8Y_HEADER_AUTHORIZATION: ${{ secrets.C8Y_HEADER_AUTHORIZATION }}
+          C8Y_BASEURL: ${{ secrets.C8Y_BASEURL }}
+          C8Y_USER: ${{ secrets.C8Y_USER }}
+          C8Y_PASSWORD: ${{ secrets.C8Y_PASSWORD }}

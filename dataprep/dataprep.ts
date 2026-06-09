@@ -32,7 +32,7 @@ export interface CumulocityObject {
   cumulocityType: string; // actually 'measurement' | 'event' | 'alarm' | 'operation';
 
   /** Since we usually don't know the C8Y ID to put in the payload, 
-   * the data preparation rule can specify a single external ID to lookup (and optionally create). 
+   * the data preparation rule can specify a single external ID to lookup (and automatically create if it does not exist). 
    * it is mandatory to include one item when sending this (unless the internal C8Y "id" is known and passed in the payload, or it's an operation where there's a dedicated field). 
    * When a Cumulocity message (e.g. operation) is received, this will contain a list of ALL external ids for this Cumulocity device.
    */
@@ -135,6 +135,30 @@ export interface Operation extends CumulocityObject {
     description?: string;
 
     /* The operation details/fragments (e.g. c8y_Restart, c8y_Firmware). */
+    [fragment: string]: any;
+  };
+}
+
+/**
+ * Updates a Cumulocity Managed Object. Extends the base {@link CumulocityObject}.
+ * @remarks
+ * This is for updating existing managed objects by external ID, not for creating new ones.
+ * Only the fields provided in the payload will be updated; other fields on the managed object are left unchanged.
+ * To delete a custom fragment, set its value to null.
+ *
+ * @property cumulocityType - Discriminator, always "managedObject".
+ * @property payload - The fields to update on the managed object. All fields are optional to support partial updates.
+ */
+export interface ManagedObject extends CumulocityObject {
+  cumulocityType: "managedObject";
+
+  payload: {
+    name?: string;
+    owner?: string;
+    type?: string;
+    c8y_IsDevice?: {};
+    c8y_SupportedOperations?: string[];
+    /** Custom fragments. Set a fragment to null to delete it from the managed object. */
     [fragment: string]: any;
   };
 }

@@ -1,11 +1,11 @@
 /**
- * Example data preparation rule: converts a JSON text payload
- * from an MQTT device into a Cumulocity Measurement.
+ * Example rule: converts a JSON temperature/humidity payload from an MQTT
+ * device into Cumulocity measurements.
  *
  * Expected incoming payload (JSON text):
  *   { "temperature": 25.5, "humidity": 60 }
  */
-import type { DeviceMessage, DataPrepContext, CumulocityObject, Measurement } from '../../dataprep/dataprep';
+import type { DeviceMessage, DataPrepContext, CumulocityObject, Measurement } from '@c8y/dataprep-types';
 
 interface WeatherPayload {
   temperature?: number;
@@ -16,16 +16,17 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): Cumuloc
   const text = new TextDecoder().decode(msg.payload);
   const data: WeatherPayload = JSON.parse(text);
 
+  const deviceId = msg.clientID ?? msg.topic;
+  const time = msg.time ?? new Date();
   const results: CumulocityObject[] = [];
 
-  // Create a temperature measurement if present
   if (data.temperature != null) {
     const measurement: Measurement = {
       cumulocityType: 'measurement',
-      externalSource: [{ externalId: msg.topic, type: 'c8y_Serial' }],
+      externalSource: [{ externalId: deviceId, type: 'c8y_Serial' }],
       payload: {
         type: 'c8y_Weather',
-        time: msg.time || new Date(),
+        time,
         c8y_Temperature: {
           T: { value: data.temperature, unit: '°C' },
         },
@@ -34,14 +35,13 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): Cumuloc
     results.push(measurement);
   }
 
-  // Create a humidity measurement if present
   if (data.humidity != null) {
     const measurement: Measurement = {
       cumulocityType: 'measurement',
-      externalSource: [{ externalId: msg.topic, type: 'c8y_Serial' }],
+      externalSource: [{ externalId: deviceId, type: 'c8y_Serial' }],
       payload: {
         type: 'c8y_Weather',
-        time: msg.time || new Date(),
+        time,
         c8y_Humidity: {
           H: { value: data.humidity, unit: '%' },
         },

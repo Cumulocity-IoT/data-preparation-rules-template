@@ -1,0 +1,9 @@
+# Battery level is healthy, so the rule should produce no alarm (no output).
+inputs:
+  - payload: '{"battery": 85}'
+    payloadFormat: json
+    topic: "devices/sensor01/status"
+    clientID: "sensor01"
+    time: "2026-01-01T12:00:00.000Z"
+
+expectedOutput: []

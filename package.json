@@ -1,19 +1,32 @@
 {
-  "name": "dataprep-rules",
+  "name": "datapreparation-rules-template",
   "version": "1.0.0",
-  "description": "Cumulocity Data Preparation Rules - Development Template",
-  "author": "",
+  "description": "Development template for authoring, validating, testing and deploying Cumulocity Data Preparation rules from an IDE.",
+  "type": "module",
+  "license": "Apache-2.0",
   "private": true,
-  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "check": "tsc --noEmit",
+    "lint": "eslint rules/",
+    "validate": "node scripts/validate.js",
     "test": "node scripts/test.js",
-    "deploy": "tsc --noEmit && node scripts/deploy.js"
+    "deploy": "node scripts/deploy.js",
+    "create-rule": "node scripts/create-rule.js",
+    "docs": "typedoc"
   },
   "devDependencies": {
-    "typescript": "^5.5.4"
-  },
-  "dependencies": {
-    "js-yaml": "^4.1.1"
+    "@c8y/dataprep-types": "^1.0.0",
+    "@jridgewell/trace-mapping": "^0.3.25",
+    "ajv": "^8.17.1",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.15.0",
+    "tar": "^7.4.3",
+    "typedoc": "^0.27.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.16.0",
+    "yaml": "^2.6.0"
   }
 }

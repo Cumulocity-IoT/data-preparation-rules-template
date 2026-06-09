@@ -1,245 +1,221 @@
-# Cumulocity Data Preparation Rules
+# Cumulocity Data Preparation Rules — Development Template
 
-This project is a development template for creating, testing, and deploying data preparation rules for Cumulocity IoT. Rules transform raw device messages (e.g. MQTT payloads) into Cumulocity domain objects (measurements, events, alarms) and vice versa.
+Develop, validate, test, and deploy **Cumulocity Data Preparation rules** from your
+IDE instead of the Cumulocity UI. Rules transform raw device messages (e.g. MQTT
+payloads) into Cumulocity domain objects — measurements, alarms, events, operations —
+or send messages back to devices.
 
-Rules are written in **TypeScript** with full type checking and IntelliSense in VS Code. TypeScript is transpiled to JavaScript automatically during deployment and platform testing.
+Rules are authored in **TypeScript** with full type-checking and IntelliSense, and
+bundled to a single ES2023 JavaScript file automatically at test/deploy time.
 
-## Installation and Setup
+> For the full feature overview and platform integration details, see the
+> [Data Preparation product documentation](https://cumulocity.com/guides/).
 
-The project requires [Node.js](https://nodejs.org/) (v18+) and [npm](https://www.npmjs.com/).
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-## Project Structure
-
-```
-rules/
-  weather-measurements/   # Each folder is one rule (folder name = rule name)
-    data-prep.yaml        # Rule configuration
-    smartFunction.ts      # Smart function implementation (TypeScript)
-    tests/                # Platform test definitions (YAML)
-  battery-alarm/
-    data-prep.yaml
-    smartFunction.ts
-    tests/
-dataprep/                 # Types (do not modify)
-  dataprep.ts            # Exported types: DeviceMessage, Measurement, Alarm, etc.
-scripts/                  # Automation scripts
-  test.js               # Executes platform tests via run-tests endpoint
-  deploy.js             # Builds tar.gz and deploys to platform
-```
-
-Each rule lives in its own folder under `rules/`. The folder name is used as the rule name when deploying.
-
-## Developer Flow
-
-The developer workflow consists of offline checks (fast, no credentials) and platform operations (require a live Cumulocity environment):
+## Quick start
 
 ```bash
-npm run check        # TypeScript type checking (offline)
-npm run test         # Platform tests via run-tests API (requires credentials)
-npm run deploy       # Build tar.gz and deploy to platform (requires credentials)
+npm install                                   # 1. install tooling
+npm run create-rule -- my-rule                # 2. scaffold a new rule
+npm run check && npm run lint && npm run validate   # 3. offline checks
+npm run test  -- rules/my-rule                # 4. run platform tests (needs credentials)
+npm run deploy -- rules/my-rule               # 5. deploy to your tenant
 ```
 
-Type checking catches type mistakes and incorrect API usage entirely offline. Platform tests provide authoritative correctness validation against the real runtime.
+## 1. Prerequisites
 
-## Writing Rules
+- **Node.js 22, 24, or 26** and npm. (`fetch` and the tooling require Node 22+.)
+- A **Cumulocity tenant** with the Data Preparation microservice subscribed, and a
+  user with the `DATA_PREPARATION_RULES_ADMIN` role (plus `DEPLOYMENTS_ADMIN` to deploy).
+- **VS Code** recommended (this repo ships workspace settings and extension
+  recommendations for ESLint and YAML schema validation).
 
-### Rule Function Signature
+See the [Data Preparation product documentation](https://cumulocity.com/guides/) for
+platform setup.
 
-Every rule file must export an `onMessage` function:
+## 2. Getting started
 
-```typescript
-export function onMessage(msg: DeviceMessage, context: DataPrepContext): CumulocityObject[] {
-  // Your rule logic here
-  return [/* CumulocityObject or DeviceMessage items */];
-}
+1. **Fork or clone** this repository.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Open the folder in VS Code and install the recommended extensions when prompted.
+
+## 3. Creating a rule
+
+```bash
+npm run create-rule -- my-rule
 ```
 
-### Execution Environment
+This scaffolds `rules/my-rule/` containing `data-prep.yaml`, `smartFunction.ts`, and
+`tests/example.yaml`. The folder name becomes the rule name on the platform, so it
+must not contain any of these characters:
 
-The smart function runtime is a restricted JavaScript environment. It is **not** Node.js.
-
-**Available:**
-- ES2023 language features and standard built-in objects
-- Platform-provided built-ins: `TextDecoder`, `TextEncoder`, `console`
-- Importable libraries: `cbor2.js`, `protobufjs.js`
-
-**Not available:**
-- Node.js APIs (`process`, `require`, `fs`, `Buffer`, etc.)
-- Browser/Web APIs (`fetch`, `setTimeout`, `XMLHttpRequest`, DOM, etc.)
-- Dynamic code execution (`eval`, `new Function`)
-
-### Input: DeviceMessage
-
-The `msg` parameter contains:
-- `payload` — `Uint8Array` containing the raw device data. Use `new TextDecoder().decode(msg.payload)` for text formats.
-- `topic` — The transport topic (e.g. MQTT topic).
-- `transportID` — Identifier for the transport (e.g. `"mqtt"`).
-- `time` — Optional timestamp of the incoming message.
-- `transportFields` — Optional dictionary of transport-specific fields.
-
-### Output: CumulocityObject / DeviceMessage
-
-The function returns an array of objects to create in Cumulocity. Available types:
-- **`Measurement`** — Time-series data (e.g. temperature, pressure).
-- **`Alarm`** — Alert conditions (e.g. high temperature warning).
-- **`Event`** — Discrete occurrences (e.g. door opened).
-- **`Operation`** — Device control commands.
-- **`DeviceMessage`** — Send data back to a device.
-
-Each `CumulocityObject` must include an `externalSource` array to identify the device.
-
-### Type Checking
-
-The type declarations in `dataprep/dataprep.ts` export `DeviceMessage`, `Measurement`, `Alarm`, `Event`, `Operation`, `CumulocityObject`, and `DataPrepContext`. Import the types you need at the top of your rule file:
-
-```typescript
-import type { DeviceMessage, DataPrepContext, CumulocityObject, Measurement } from '../../dataprep/dataprep';
+```
+/   \   *   ?   "   '   `   |   %   \0 (null)
 ```
 
-Then use standard TypeScript type annotations:
+## 4. Writing the Smart Function
+
+Each rule exports a single `onMessage` function:
 
 ```typescript
-const measurement: Measurement = {
-  cumulocityType: 'measurement',
-  externalSource: [{ externalId: msg.topic, type: 'c8y_Serial' }],
-  payload: {
-    type: 'c8y_Temperature',
-    time: msg.time || new Date(),
-    c8y_Temperature: {
-      T: { value: 25.5, unit: '°C' },
-    },
-  },
-};
-```
+import type { DeviceMessage, DataPrepContext, CumulocityObject } from '@c8y/dataprep-types';
 
-You can also define interfaces for your incoming payloads:
-
-```typescript
-interface SensorPayload {
-  temperature?: number;
-  humidity?: number;
-}
-
-export function onMessage(msg: DeviceMessage, context: DataPrepContext): CumulocityObject[] {
+export function onMessage(msg: DeviceMessage, context: DataPrepContext): (CumulocityObject | DeviceMessage)[] {
   const text = new TextDecoder().decode(msg.payload);
-  const data: SensorPayload = JSON.parse(text);
-  // data.temperature and data.humidity are now type-checked
+  const data = JSON.parse(text);
+  // ... build outputs ...
+  return [];
 }
 ```
 
-Run the type checker across all files:
+The Smart Function runs in a **restricted runtime** — not Node.js, not a browser.
 
-```bash
-npm run check
-```
+- **Available:** ES2023 built-ins, `console`, `TextDecoder`, `TextEncoder`, and the
+  importable bundled libraries `cbor2.js` and `protobufjs.js`.
+- **Not available:** `fetch`, timers (`setTimeout`/`setInterval`), `process`, `Buffer`,
+  `require`, DOM/browser APIs, `eval`/`new Function`. `npm run lint` flags these.
 
-## Testing
+Types come from the [`@c8y/dataprep-types`](https://www.npmjs.com/package/@c8y/dataprep-types)
+package. See the published **[TypeScript API reference (TypeDoc)](https://cumulocity-iot.github.io/datapreparation-rules-template/)**
+and the Smart Function section of the
+[Cumulocity Data Preparation product docs](https://cumulocity.com/guides/) for the
+available types and runtime details.
 
-All testing is done via the platform's existing run-tests endpoint. There is no local test sandbox — the platform is the authoritative runtime and the single source of truth for rule behaviour.
-
-### Setup
-
-The test script needs a Cumulocity base URL and credentials. The authenticated user must have the `DATA_PREPARATION_RULES_ADMIN` role.
-
-Set credentials as environment variables in your shell session:
-
-```bash
-export C8Y_BASEURL=https://mytenant.cumulocity.com
-export C8Y_USER=myuser
-export C8Y_PASSWORD=$(read -rs -p "Password: " p && echo "$p")
-```
-
-The `read -s` flag suppresses echoing so the password never appears on screen, and using command substitution keeps it out of your shell history.
-
-### Test Definitions
-
-Platform tests are defined as individual YAML files in a `tests/` directory within each rule folder. Each file defines one test with its input messages:
+## 5. Configuring `data-prep.yaml`
 
 ```yaml
-# tests/temperature-only.yaml
-inputs:
-  - payload: '{"temperature": 25.5}'
-    payloadFormat: json
-    topic: "devices/sensor01/data"
-    time: "2026-01-01T12:00:00Z"
+smartFunctionFile: "smartFunction.ts"   # required: file containing onMessage
+input:                                  # required
+  transport: mqtt                       # required (currently only "mqtt")
+  topicPattern: "devices/+/data"        # required; must not contain "**"
+  clientIDPattern: "*"                  # optional
+description: "What this rule does"       # optional
+tags: ["example"]                       # optional
+disabled: false                          # optional (default false)
 ```
 
-Each input has these fields:
-- `payload` — The message payload as a string.
-- `topic` — **(required)** The transport topic.
-- `payloadFormat` — `"json"` (currently the only supported format).
-- `clientID` — Client identifier (default: `""`).
-- `time` — ISO timestamp (default: current time).
-- `transportID` — Transport identifier (default: `""`).
+The authoritative schema is in [`schemas/data-prep.schema.json`](schemas/data-prep.schema.json).
+With the recommended VS Code YAML extension you get inline validation and completion.
 
-### Running Tests
+## 6. Writing tests
+
+Each file under a rule's `tests/` folder is one named test case (the filename without
+extension is the test name):
+
+```yaml
+# rules/my-rule/tests/basic.yaml
+inputs:
+  - payload: '{"temperature": 23.5}'
+    payloadFormat: json          # optional; only "json" is supported
+    topic: "devices/device01/data"
+    clientID: "device01"
+    time: "2026-01-01T12:00:00.000Z"
+
+expectedOutput:                  # optional
+  - cumulocityType: measurement
+    externalSource:
+      - externalId: device01
+        type: c8y_Serial
+    payload:
+      type: c8y_Temperature
+      time: "2026-01-01T12:00:00.000Z"
+      c8y_Temperature:
+        T:
+          value: 23.5
+          unit: "°C"
+```
+
+A test **passes** if no runtime error occurs. If `expectedOutput` is present, the
+actual outputs must additionally match it element-by-element (canonical JSON). See the
+[`weather-measurements`](rules/weather-measurements) and
+[`battery-alarm`](rules/battery-alarm) example rules.
+
+## 7. Offline validation (no credentials)
 
 ```bash
-# Test a single rule:
-npm run test -- rules/weather-measurements
+npm run check      # TypeScript type-checking (tsc --noEmit)
+npm run lint       # ESLint — flags use of unavailable runtime globals
+npm run validate   # JSON Schema validation of every data-prep.yaml and test file
+```
 
-# Test all rules:
+These run in CI on every push and pull request.
+
+## 8. Running tests against the platform
+
+```bash
+npm run test                    # all rules
+npm run test -- rules/my-rule   # one rule
+```
+
+Credentials are resolved **token/session first**, with basic auth as a fallback:
+
+| Purpose | Sources (in order) |
+|---------|--------------------|
+| Host | `C8Y_HOST`, then `C8Y_BASEURL`, then `--host <url>` |
+| Authorization header | `C8Y_HEADER`, then `C8Y_HEADER_AUTHORIZATION`, then `--header "Authorization: ..."` |
+| Basic fallback | `C8Y_USER` + `C8Y_PASSWORD` (only if no header is set) |
+
+Because the host/header variables match the [`c8ycli`](https://www.npmjs.com/package/@c8y/cli)
+session environment, an existing `c8ycli` session can be reused without re-entering
+credentials. To avoid storing a password on disk:
+
+```bash
+export C8Y_HOST=https://mytenant.cumulocity.com
+export C8Y_USER=myuser
+export C8Y_PASSWORD=$(read -rs -p "Password: " p && echo "$p")
 npm run test
 ```
 
-The script transpiles the TypeScript to JavaScript, sends it along with the test inputs to the platform's run-tests endpoint, and reports pass/fail status, generated outputs, and any captured console logs.
-
-### GitHub Actions
-
-The included CI workflow (`.github/workflows/ci.yml`) runs type checking on every push. Platform tests can be triggered manually via `workflow_dispatch` — configure these repository secrets:
-
-- `C8Y_BASEURL` — Cumulocity base URL
-- `C8Y_USER` — Username
-- `C8Y_PASSWORD` — Password
-
-## Deploying
-
-Deploy a rule to a Cumulocity platform using the deploy script. This type-checks, transpiles the TypeScript to JavaScript, packages the rule folder contents (data-prep.yaml, compiled JS, and tests) into a tar.gz archive, and deploys it via `PUT /rules/{ruleName}/deployed`.
-
-### Configuration
-
-Each rule folder must contain a `data-prep.yaml`:
-
-```yaml
-description: "My rule description"
-tags:
-  - my-tag
-smartFunctionFile: "smartFunction.ts"
-input:
-  transport: mqtt
-  topicPattern: "devices/*/data"
-  clientIDPattern: "*"
-```
-
-Fields:
-- `smartFunctionFile` — **(required)** The `.ts` file containing the `onMessage` function.
-- `input` — **(required)** Defines which messages the rule receives:
-  - `transport` — Transport type (e.g. `mqtt`).
-  - `topicPattern` — Topic filter pattern (supports `*` wildcards).
-  - `clientIDPattern` — Client ID filter pattern (supports `*` wildcards).
-- `description` — Human-readable description.
-- `tags` — List of tags for organising rules.
-- `disabled` — Set to `true` to prevent the rule from activating on deploy (default: `false`).
-
-### Running deploy
-
-Set credentials and run:
+## 9. Deploying
 
 ```bash
-export C8Y_BASEURL=https://mytenant.cumulocity.com
-export C8Y_PASSWORD=$(read -rs -p "Password: " p && echo "$p")
-
-# Deploy a single rule:
-npm run deploy -- rules/weather-measurements
-
-# Deploy all rules:
-npm run deploy
+npm run deploy                    # all rules
+npm run deploy -- rules/my-rule   # one rule
 ```
 
-The rule name is the folder name (e.g. `weather-measurements`).
+`deploy` validates all selected rules offline first, then bundles each rule
+(`data-prep.yaml` + compiled `.js` + `tests/*.yaml`) into a `tar.gz` and uploads it via
+`PUT /service/dataprep/v1/rules/<name>/deployed`. The rule name is the folder name.
+
+## 10. CI/CD
+
+- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs `check`, `lint`,
+  and `validate` on Node 22/24/26 for every push and pull request. A manual
+  `workflow_dispatch` option can additionally run platform tests.
+- **CD** ([`.github/workflows/cd.yml`](.github/workflows/cd.yml)) runs the offline
+  checks, then `test` and `deploy`, on manual dispatch or when a release is published.
+
+Configure these repository secrets (token-first preferred, basic as fallback):
+
+| Secret | Purpose |
+|--------|---------|
+| `C8Y_HOST` | Tenant base URL |
+| `C8Y_HEADER_AUTHORIZATION` | Authorization header (preferred) |
+| `C8Y_BASEURL`, `C8Y_USER`, `C8Y_PASSWORD` | Basic auth fallback |
+
+## 11. Updating the TypeScript types
+
+The type declarations are published as [`@c8y/dataprep-types`](https://www.npmjs.com/package/@c8y/dataprep-types)
+and kept up to date here automatically. To pull the latest types manually:
+
+```bash
+npm install @c8y/dataprep-types@latest
+```
+
+---
+
+## Repository layout
+
+```
+rules/<rule-name>/        one folder per rule (folder name = rule name)
+  data-prep.yaml          rule configuration
+  smartFunction.ts        the onMessage implementation
+  tests/<name>.yaml       platform test cases
+dataprep/dataprep.ts      vendored copy of the @c8y/dataprep-types declarations
+schemas/                  JSON Schemas used by `npm run validate` and the YAML editor
+scripts/                  validate / create-rule / test / deploy automation
+```
+
+See [`AGENTS.md`](AGENTS.md) for AI-assistant guidance and a concise runtime reference.

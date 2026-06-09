@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build / generated output
+dist/
+docs/
+*.tsbuildinfo
+
+# Transpiled rule output (TypeScript is the source of truth; .js is generated)
+rules/**/*.js
+
+# Local credentials / environment
+.env
+.env.*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
