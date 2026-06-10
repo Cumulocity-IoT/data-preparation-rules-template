@@ -1,0 +1,7 @@
+{
+  "name": "@c8y/dataprep-types",
+  "version": "1.0.0",
+  "description": "Vendored copy of the Cumulocity Data Preparation Smart Function type declarations. Replaced by the published @c8y/dataprep-types package once available.",
+  "license": "Apache-2.0",
+  "types": "index.d.ts"
+}

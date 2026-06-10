@@ -33,6 +33,9 @@ export async function bundleRule(tsSourcePath) {
     format: 'esm',
     target: 'es2023',
     write: false,
+    // An output path is required for an external sourcemap even though nothing
+    // is written to disk (write: false). esbuild only uses it to name outputs.
+    outdir: 'dist',
     sourcemap: 'external',
     sourcesContent: true,
     logLevel: 'silent',

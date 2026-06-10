@@ -8,11 +8,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@c8y/dataprep-types": ["./dataprep/dataprep.ts"]
-    }
+    "skipLibCheck": true
   },
   "include": ["rules/**/*.ts"]
 }
