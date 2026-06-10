@@ -79,7 +79,7 @@ tags:
 smartFunctionFile: "smartFunction.ts"
 input:
   transport: mqtt
-  topicPattern: "devices/+/data"
+  topicPattern: "devices/*/data"
   clientIDPattern: "*"
 `;
 }
