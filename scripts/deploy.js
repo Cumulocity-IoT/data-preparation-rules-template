@@ -77,10 +77,13 @@ async function packageRule(ruleFolder) {
   const jsName = deployedJsName(config.smartFunctionFile);
 
   // The archive contains the bundled .js, so data-prep.yaml must reference it.
-  const deployedYaml = raw.replace(
-    /^(\s*smartFunctionFile:\s*).*$/m,
-    `$1"${jsName}"`,
-  );
+  // Also normalise the topicPattern: the platform uses * for single-level wildcard,
+  // but MQTT convention uses +.
+  const deployedYaml = raw
+    .replace(/^(\s*smartFunctionFile:\s*).*$/m, `$1"${jsName}"`)
+    .replace(/(^\s*topicPattern:\s*)(.+)$/m, (_, prefix, value) =>
+      prefix + value.replace(/\+/g, '*'),
+    );
 
   const entries = [
     { name: 'data-prep.yaml', content: deployedYaml },

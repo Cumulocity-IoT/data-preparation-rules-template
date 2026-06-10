@@ -214,11 +214,16 @@ async function main() {
       };
     }
 
+    // Normalise topicPattern: platform uses * for single-level wildcard; MQTT uses +.
+    const source = {
+      ...config.input,
+      topicPattern: config.input.topicPattern?.replace(/\+/g, '*'),
+    };
     const body = {
       tests: requestTests,
       jsCode,
       config: {
-        source: config.input,
+        source,
         description: config.description,
         tags: config.tags,
         disabled: config.disabled,
