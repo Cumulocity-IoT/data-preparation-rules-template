@@ -203,9 +203,15 @@ async function main() {
       continue;
     }
 
+    // The run-tests endpoint requires transportID on every input item.
+    // Use the explicit transportId from data-prep.yaml if set; otherwise
+    // fall back to the transport type (e.g. "mqtt"), matching platform behaviour.
+    const transportID = config.input.transportId ?? config.input.transport;
     const requestTests = {};
     for (const [name, def] of Object.entries(tests)) {
-      requestTests[name] = { inputs: def.inputs };
+      requestTests[name] = {
+        inputs: def.inputs.map((input) => ({ transportID, ...input })),
+      };
     }
 
     const body = {

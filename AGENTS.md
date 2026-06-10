@@ -73,7 +73,7 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
 | `smartFunctionFile` | string | yes | The `.ts` file with `onMessage` (e.g. `smartFunction.ts`). |
-| `input` | object | yes | `transport` (yes), `topicPattern` (yes, must not contain `**`), `clientIDPattern` (optional). |
+| `input` | object | yes | `transport` (yes), `topicPattern` (yes, must not contain `**`), `transportId` (optional — identifier for a specific transport instance; defaults to `transport` if omitted), `clientIDPattern` (optional). |
 | `description` | string | no | Human-readable description. |
 | `tags` | string[] | no | Organisational tags. |
 | `disabled` | boolean | no | Deploy as disabled (default `false`). |

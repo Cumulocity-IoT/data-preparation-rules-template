@@ -29,6 +29,10 @@
           "not": { "pattern": "\\*\\*" },
           "description": "Topic filter. Supports + (single-level) and # (multi-level) wildcards. Must not contain '**'."
         },
+        "transportId": {
+          "type": "string",
+          "description": "Identifier for the specific transport instance (e.g. the name of the MQTT connector). When omitted, the scripts derive it from the `transport` field."
+        },
         "clientIDPattern": {
           "type": "string",
           "description": "Optional device client ID filter. Supports * as a wildcard."
