@@ -9,8 +9,10 @@
 // Exits non-zero if any validation error is found.
 
 import { compileSchemas, discoverRuleFolders, validateRuleFolder } from './lib/rules.js';
+import { boldGreen, red, boldRed, yellow, header } from './lib/cli-color.js';
 
 function main() {
+  console.log(header('Running schema validation'));
   const args = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 
   let ruleFolders;
@@ -22,7 +24,7 @@ function main() {
   }
 
   if (ruleFolders.length === 0) {
-    console.log('No rules found under rules/. Nothing to validate.');
+    console.log(yellow('No rules found under rules/. Nothing to validate.'));
     process.exit(0);
   }
 
@@ -35,14 +37,15 @@ function main() {
   }
 
   if (allErrors.length > 0) {
-    console.error(`✗ Validation failed with ${allErrors.length} error(s):\n`);
+    console.error(boldRed(`✗ Validation failed with ${allErrors.length} error(s):\n`));
     for (const error of allErrors) {
-      console.error(`  ${error}`);
+      console.error(red(`  ${error}`));
     }
+    console.error();
     process.exit(1);
   }
 
-  console.log(`✓ All ${ruleFolders.length} rule(s) passed schema validation.`);
+  console.log(boldGreen(`✓ All ${ruleFolders.length} rule(s) passed schema validation.\n`));
   process.exit(0);
 }
 

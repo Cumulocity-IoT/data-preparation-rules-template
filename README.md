@@ -14,11 +14,11 @@ bundled to a single ES2023 JavaScript file automatically at test/deploy time.
 ## Quick start
 
 ```bash
-npm install                                   # 1. install tooling
-npm run create-rule -- my-rule                # 2. scaffold a new rule
+npm install                                         # 1. install tooling
+npm run create-rule -- my-rule                      # 2. scaffold a new rule
 npm run check && npm run lint && npm run validate   # 3. offline checks
-npm run test  -- rules/my-rule                # 4. run platform tests (needs credentials)
-npm run deploy -- rules/my-rule               # 5. deploy to your tenant
+npm run test  -- rules/my-rule                      # 4. run platform tests (needs credentials)
+npm run deploy -- rules/my-rule                     # 5. deploy to your tenant
 ```
 
 ## 1. Prerequisites
@@ -89,11 +89,11 @@ available types and runtime details.
 smartFunctionFile: "smartFunction.ts"   # required: file containing onMessage
 input:                                  # required
   transport: mqtt                       # required (currently only "mqtt")
-  topicPattern: "devices/+/data"        # required; must not contain "**"
+  topicPattern: "devices/*/data"        # required
   clientIDPattern: "*"                  # optional
-description: "What this rule does"       # optional
+description: "What this rule does"      # optional
 tags: ["example"]                       # optional
-disabled: false                          # optional (default false)
+disabled: false                         # optional (default false)
 ```
 
 The authoritative schema is in [`schemas/data-prep.schema.json`](schemas/data-prep.schema.json).

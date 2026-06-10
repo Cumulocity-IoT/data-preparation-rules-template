@@ -131,6 +131,10 @@ export function validateRuleFolder(ruleFolder, schemas) {
 
 function formatAjvErrors(filePath, ajvErrors) {
   return (ajvErrors ?? []).map((e) => {
+    // Improve readability for the common topicPattern wildcard constraint.
+    if (e.keyword === 'not' && e.instancePath === '/input/topicPattern') {
+      return `${filePath}: /input/topicPattern must not contain "**" (use "*" as the wildcard)`;
+    }
     const where = e.instancePath || '(root)';
     return `${filePath}: ${where} ${e.message}`;
   });

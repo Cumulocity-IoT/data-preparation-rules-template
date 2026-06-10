@@ -9,8 +9,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "check": "tsc --noEmit",
-    "lint": "eslint rules/",
+    "check": "node scripts/check.js",
+    "lint": "node scripts/lint.js",
     "validate": "node scripts/validate.js",
     "test": "node scripts/test.js",
     "deploy": "node scripts/deploy.js",

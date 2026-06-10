@@ -35,7 +35,7 @@
           "not": {
             "pattern": "\\*\\*"
           },
-          "description": "Topic filter. Use * as a wildcard (e.g. sensors/*/temperature). Must not contain '**'. Do not use MQTT-style + or # wildcards."
+          "description": "Topic filter. Supports `*` as a wildcard. Must not contain `**`."
         },
         "transportID": {
           "type": "string",
@@ -43,7 +43,7 @@
         },
         "clientIDPattern": {
           "type": "string",
-          "description": "Optional device client ID filter. Supports * as a wildcard."
+          "description": "Optional device client ID filter. Supports `*` as a wildcard."
         }
       }
     },
