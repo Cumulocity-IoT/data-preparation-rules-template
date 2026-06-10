@@ -5,7 +5,9 @@
   "description": "Schema for rules/<rule-name>/tests/<name>.yaml",
   "type": "object",
   "additionalProperties": false,
-  "required": ["inputs"],
+  "required": [
+    "inputs"
+  ],
   "properties": {
     "inputs": {
       "type": "array",
@@ -14,7 +16,12 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["payload", "topic", "clientID", "time"],
+        "required": [
+          "payload",
+          "topic",
+          "clientID",
+          "time"
+        ],
         "properties": {
           "payload": {
             "type": "string",
@@ -36,7 +43,9 @@
           },
           "payloadFormat": {
             "type": "string",
-            "enum": ["json"],
+            "enum": [
+              "json"
+            ],
             "description": "Payload encoding. Only \"json\" is currently supported."
           }
         }

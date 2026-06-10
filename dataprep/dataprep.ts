@@ -5,7 +5,7 @@ export interface DeviceMessage {
 
   /** Mandatory identifier for the source/dest transport e.g. "mqtt", "opc-ua" etc.*/
   transportID: string;
-  
+
   /** Transport client the message was received from or will be delivered to. Don't set for broadcast. */
   clientID?: string;
 
@@ -75,8 +75,8 @@ export interface Measurement extends CumulocityObject {
     time: Date;
 
     [fragment: string]:
-      | { [series: string]: MeasurementValue }
-      | any; // any = for custom fragments
+    | { [series: string]: MeasurementValue }
+    | any; // any = for custom fragments
   };
 }
 
@@ -131,7 +131,7 @@ export interface Operation extends CumulocityObject {
   payload: {
     /** The state of the operation. */
     status?: "PENDING" | "SUCCESSFUL" | "FAILED" | "EXECUTING";
-    
+
     description?: string;
 
     /* The operation details/fragments (e.g. c8y_Restart, c8y_Firmware). */

@@ -5,7 +5,10 @@
   "description": "Schema for rules/<rule-name>/data-prep.yaml",
   "type": "object",
   "additionalProperties": false,
-  "required": ["smartFunctionFile", "input"],
+  "required": [
+    "smartFunctionFile",
+    "input"
+  ],
   "properties": {
     "smartFunctionFile": {
       "type": "string",
@@ -15,7 +18,10 @@
     "input": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["transport", "topicPattern"],
+      "required": [
+        "transport",
+        "topicPattern"
+      ],
       "description": "Source/transport configuration describing which messages the rule receives.",
       "properties": {
         "transport": {
@@ -26,10 +32,12 @@
         "topicPattern": {
           "type": "string",
           "minLength": 1,
-          "not": { "pattern": "\\*\\*" },
+          "not": {
+            "pattern": "\\*\\*"
+          },
           "description": "Topic filter. Use * as a wildcard (e.g. sensors/*/temperature). Must not contain '**'. Do not use MQTT-style + or # wildcards."
         },
-        "transportId": {
+        "transportID": {
           "type": "string",
           "description": "Identifier for the specific transport instance (e.g. the name of the MQTT connector). When omitted, the scripts derive it from the `transport` field."
         },
@@ -45,7 +53,9 @@
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "List of tags for organising rules."
     },
     "disabled": {
