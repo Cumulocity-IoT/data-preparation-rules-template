@@ -19,7 +19,7 @@ import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
 import { resolveAuth, isFatalAuthStatus } from './lib/auth.js';
 import { discoverRuleFolders, readDataPrep, listTestFiles } from './lib/rules.js';
 import { sourcePathFor, bundleRule } from './lib/bundle.js';
-import { green, red, boldRed, yellow, boldCyan, boldGreen, header } from './lib/cli-color.js';
+import { green, cyan, red, boldRed, yellow, boldCyan, boldGreen, header } from './lib/cli-color.js';
 
 const RUN_TESTS_PATH = '/service/dataprep/v1/run-tests';
 
@@ -103,7 +103,7 @@ function reportResults(results, tests, traceMap) {
 
     if (!Array.isArray(perInput)) {
       // e.g. a top-level timeout error object
-      console.log(boldRed(`  ✗ ${testName}: unexpected response — ${JSON.stringify(perInput)}`));
+      console.log(red(`  ✗ ${testName}: unexpected response - ${JSON.stringify(perInput)}`));
       failures++;
       continue;
     }
@@ -115,9 +115,9 @@ function reportResults(results, tests, traceMap) {
       if (result.error) {
         failures++;
         const message = result.error.message || result.error;
-        console.log(boldRed(`  ✗ ${label}: ERROR — ${message}`));
+        console.log(red(`  ✗ ${label}: ERROR - ${message}`));
         if (result.error.stack) {
-          console.log(indent(mapStack(result.error.stack, traceMap)));
+          console.log(indent(mapStack(result.error.stack, traceMap).trimEnd()));
         }
       } else {
         const outputs = result.outputs || [];
@@ -127,7 +127,7 @@ function reportResults(results, tests, traceMap) {
           const expectedCanon = canonical(expectedOutput);
           if (actualCanon !== expectedCanon) {
             failures++;
-            console.log(boldRed(`  ✗ ${label}: output did not match expectedOutput`));
+            console.log(red(`  ✗ ${label}: output did not match expectedOutput`));
             const diff = jsonDiff.diff(expectedCanon, actualCanon);
             const expectedHighlighted = diff
               .filter((part) => !part.added)
@@ -170,7 +170,7 @@ async function main() {
   try {
     auth = resolveAuth();
   } catch (err) {
-    console.error(`Error: ${err.message}`);
+    console.error(boldRed(`Error: ${err.message}\n`));
     process.exit(2);
   }
 
@@ -178,12 +178,12 @@ async function main() {
   try {
     ruleFolders = discoverRuleFolders(positionalArgs());
   } catch (err) {
-    console.error(`Error: ${err.message}`);
+    console.error(boldRed(`Error: ${err.message}\n`));
     process.exit(2);
   }
 
   if (ruleFolders.length === 0) {
-    console.log(yellow('No rules found under rules/. Nothing to test.'));
+    console.log(yellow('No rules found under rules/. Nothing to test.\n'));
     process.exit(0);
   }
 
@@ -199,7 +199,7 @@ async function main() {
     const { config } = readDataPrep(ruleFolder);
     const tsPath = sourcePathFor(ruleFolder, config.smartFunctionFile);
     if (!fs.existsSync(tsPath)) {
-      console.error(boldRed(`  ✗ smart function source not found: ${tsPath}`));
+      console.error(red(`  ✗ smart function source not found: ${tsPath}`));
       totalFailures++;
       continue;
     }
@@ -209,7 +209,7 @@ async function main() {
     try {
       ({ jsCode, map } = await bundleRule(tsPath));
     } catch (err) {
-      console.error(boldRed(`  ✗ failed to bundle ${tsPath}: ${err.message}`));
+      console.error(red(`  ✗ failed to bundle ${tsPath}: ${err.message}`));
       totalFailures++;
       continue;
     }
@@ -248,15 +248,18 @@ async function main() {
     try {
       ({ response, text } = await runTests(auth.baseUrl, auth.authorizationHeader, body));
     } catch (err) {
-      console.error(boldRed(`Error: failed to reach ${auth.baseUrl}: ${err.message}`));
-      if (firstRequest) process.exit(2);
+      if (firstRequest) {
+        console.error(boldRed(`Error: failed to reach ${auth.baseUrl}: ${err.message}\n`));
+        process.exit(2);
+      }
+      console.error(red(`Error: failed to reach ${auth.baseUrl}: ${err.message}`));
       totalFailures++;
       continue;
     }
     firstRequest = false;
 
     if (isFatalAuthStatus(response.status)) {
-      console.error(red(`Error: authentication failed (HTTP ${response.status}). Check your credentials.`));
+      console.error(boldRed(`Error: authentication failed (HTTP ${response.status}). Check your credentials.\n`));
       process.exit(2);
     }
     if (!response.ok) {
@@ -277,9 +280,9 @@ async function main() {
     totalFailures += reportResults(results, tests, traceMap);
   }
 
-  // console.log(`\n${'='.repeat(40)}`);
   if (totalFailures > 0) {
-    console.error(boldRed(`\n✗ ${totalFailures} test failure(s).\n`));
+    const noun = totalFailures === 1 ? 'failure' : 'failures';
+    console.error(boldRed(`\n✗ ${totalFailures} test ${noun}.\n`));
     process.exit(1);
   }
   console.log(boldGreen('\n✓ All tests passed.\n'));

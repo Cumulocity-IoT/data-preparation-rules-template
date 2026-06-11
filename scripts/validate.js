@@ -8,6 +8,7 @@
 //
 // Exits non-zero if any validation error is found.
 
+import path from 'node:path';
 import { compileSchemas, discoverRuleFolders, validateRuleFolder } from './lib/rules.js';
 import { boldGreen, red, boldRed, yellow, header } from './lib/cli-color.js';
 
@@ -27,6 +28,12 @@ function main() {
     process.exit(0);
   }
 
+  console.log(header(
+    ruleFolders.length === 1
+      ? `Running schema validation for ${path.basename(ruleFolders[0])}`
+      : `Running schema validation for ${ruleFolders.length} rules`,
+  ));
+
   const schemas = compileSchemas();
   const allErrors = [];
 
@@ -44,7 +51,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log(boldGreen(`✓ All ${ruleFolders.length} rule(s) passed schema validation.\n`));
+  console.log(boldGreen(`✓ Schema validation passed.\n`));
   process.exit(0);
 }
 
