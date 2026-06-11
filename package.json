@@ -21,6 +21,7 @@
     "@c8y/dataprep-types": "file:./dataprep",
     "@jridgewell/trace-mapping": "^0.3.25",
     "ajv": "^8.17.1",
+    "diff": "^9.0.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.15.0",
     "tar": "^7.4.3",

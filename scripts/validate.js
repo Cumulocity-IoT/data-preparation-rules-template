@@ -12,7 +12,6 @@ import { compileSchemas, discoverRuleFolders, validateRuleFolder } from './lib/r
 import { boldGreen, red, boldRed, yellow, header } from './lib/cli-color.js';
 
 function main() {
-  console.log(header('Running schema validation'));
   const args = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 
   let ruleFolders;

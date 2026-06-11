@@ -14,11 +14,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parse as parseYaml } from 'yaml';
+import { Diff } from 'diff';
 import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
 import { resolveAuth, isFatalAuthStatus } from './lib/auth.js';
 import { discoverRuleFolders, readDataPrep, listTestFiles } from './lib/rules.js';
 import { sourcePathFor, bundleRule } from './lib/bundle.js';
-import { boldGreen, red, yellow, cyan } from './lib/cli-color.js';
+import { green, red, boldRed, yellow, boldCyan, boldGreen, header } from './lib/cli-color.js';
 
 const RUN_TESTS_PATH = '/service/dataprep/v1/run-tests';
 
@@ -74,6 +75,11 @@ function mapStack(stack, traceMap) {
   });
 }
 
+/** Token-level diff for canonical JSON strings — treats each JSON value/key as atomic. */
+const jsonDiff = new Diff();
+jsonDiff.tokenize = (str) =>
+  str.match(/"(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|[{}[\],:]|\s+/g) ?? [];
+
 async function runTests(baseUrl, authorizationHeader, body) {
   const url = `${baseUrl}${RUN_TESTS_PATH}`;
   const response = await fetch(url, {
@@ -97,7 +103,7 @@ function reportResults(results, tests, traceMap) {
 
     if (!Array.isArray(perInput)) {
       // e.g. a top-level timeout error object
-      console.log(red(`  ✗ ${testName}: unexpected response — ${JSON.stringify(perInput)}`));
+      console.log(boldRed(`  ✗ ${testName}: unexpected response — ${JSON.stringify(perInput)}`));
       failures++;
       continue;
     }
@@ -109,7 +115,7 @@ function reportResults(results, tests, traceMap) {
       if (result.error) {
         failures++;
         const message = result.error.message || result.error;
-        console.log(red(`  ✗ ${label}: ERROR — ${message}`));
+        console.log(boldRed(`  ✗ ${label}: ERROR — ${message}`));
         if (result.error.stack) {
           console.log(indent(mapStack(result.error.stack, traceMap)));
         }
@@ -121,20 +127,29 @@ function reportResults(results, tests, traceMap) {
           const expectedCanon = canonical(expectedOutput);
           if (actualCanon !== expectedCanon) {
             failures++;
-            console.log(red(`  ✗ ${label}: output did not match expectedOutput`));
-            console.log(indent(`expected: ${expectedCanon}`));
-            console.log(indent(`actual:   ${actualCanon}`));
+            console.log(boldRed(`  ✗ ${label}: output did not match expectedOutput`));
+            const diff = jsonDiff.diff(expectedCanon, actualCanon);
+            const expectedHighlighted = diff
+              .filter((part) => !part.added)
+              .map((part) => (part.removed ? red(part.value) : part.value))
+              .join('');
+            const actualHighlighted = diff
+              .filter((part) => !part.removed)
+              .map((part) => (part.added ? green(part.value) : part.value))
+              .join('');
+            console.log(indent(`expected: ${expectedHighlighted}`));
+            console.log(indent(`actual:   ${actualHighlighted}`));
           } else {
-            console.log(boldGreen(`  ✓ ${label}: ${outputs.length} output(s), matches expectedOutput`));
+            console.log(green(`  ✓ ${label}: ${outputs.length} output(s), matches expectedOutput`));
           }
         } else {
-          console.log(boldGreen(`  ✓ ${label}: ${outputs.length} output(s)`));
+          console.log(green(`  ✓ ${label}: ${outputs.length} output(s)`));
         }
       }
 
       if (Array.isArray(result.logs) && result.logs.length > 0) {
         for (const log of result.logs) {
-          console.log(indent(yellow(`[log] ${log}`)));
+          console.log(indent(`[log] ${log}`));
         }
       }
     }
@@ -172,17 +187,19 @@ async function main() {
     process.exit(0);
   }
 
+  process.stdout.write(header(`Running tests for ${ruleFolders.length} rule${ruleFolders.length !== 1 ? 's' : ''}`));
+
   let totalFailures = 0;
   let firstRequest = true;
 
   for (const ruleFolder of ruleFolders) {
     const ruleName = path.basename(ruleFolder);
-    console.log(`\n${cyan(`=== Testing rule: ${ruleName} ===`)}`);
+    console.log(`\n${boldCyan(`=== Testing rule: ${ruleName} ===`)}`);
 
     const { config } = readDataPrep(ruleFolder);
     const tsPath = sourcePathFor(ruleFolder, config.smartFunctionFile);
     if (!fs.existsSync(tsPath)) {
-      console.error(red(`  ✗ smart function source not found: ${tsPath}`));
+      console.error(boldRed(`  ✗ smart function source not found: ${tsPath}`));
       totalFailures++;
       continue;
     }
@@ -192,7 +209,7 @@ async function main() {
     try {
       ({ jsCode, map } = await bundleRule(tsPath));
     } catch (err) {
-      console.error(red(`  ✗ failed to bundle ${tsPath}: ${err.message}`));
+      console.error(boldRed(`  ✗ failed to bundle ${tsPath}: ${err.message}`));
       totalFailures++;
       continue;
     }
@@ -231,7 +248,7 @@ async function main() {
     try {
       ({ response, text } = await runTests(auth.baseUrl, auth.authorizationHeader, body));
     } catch (err) {
-      console.error(red(`Error: failed to reach ${auth.baseUrl}: ${err.message}`));
+      console.error(boldRed(`Error: failed to reach ${auth.baseUrl}: ${err.message}`));
       if (firstRequest) process.exit(2);
       totalFailures++;
       continue;
@@ -260,12 +277,12 @@ async function main() {
     totalFailures += reportResults(results, tests, traceMap);
   }
 
-  console.log(`\n${'='.repeat(40)}`);
+  // console.log(`\n${'='.repeat(40)}`);
   if (totalFailures > 0) {
-    console.error(red(`✗ ${totalFailures} test failure(s).`));
+    console.error(boldRed(`\n✗ ${totalFailures} test failure(s).\n`));
     process.exit(1);
   }
-  console.log(boldGreen('✓ All tests passed.'));
+  console.log(boldGreen('\n✓ All tests passed.\n'));
   process.exit(0);
 }
 

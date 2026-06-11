@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { boldGreen, red, header } from './lib/cli-color.js';
 
 function main() {
-	console.log(header('Running TypeScript check'));
+	console.log(header('Running type check'));
 
 	const result = spawnSync('tsc', ['--noEmit'], {
 		stdio: 'inherit',
