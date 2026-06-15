@@ -26,6 +26,7 @@ import {
   validateRuleFolder,
 } from './lib/rules.js';
 import { sourcePathFor, bundleRule, deployedJsName } from './lib/bundle.js';
+import { green, red, boldRed, yellow, boldGreen, boldCyan, header } from './lib/cli-color.js';
 
 /** Parse CLI positionals, skipping the `--host`/`--header` value flags. */
 function positionalArgs() {
@@ -112,24 +113,30 @@ async function deployRule(baseUrl, authorizationHeader, ruleName, archive) {
 }
 
 async function main() {
-  let auth;
-  try {
-    auth = resolveAuth();
-  } catch (err) {
-    console.error(`Error: ${err.message}`);
-    process.exit(2);
-  }
-
   let ruleFolders;
   try {
     ruleFolders = discoverRuleFolders(positionalArgs());
   } catch (err) {
-    console.error(`Error: ${err.message}`);
+    console.error(boldRed(`Error: ${err.message}\n`));
+    process.exit(2);
+  }
+
+  process.stdout.write(header(
+    ruleFolders.length === 1
+      ? `Deploying ${path.basename(ruleFolders[0])}`
+      : `Deploying ${ruleFolders.length} rules`,
+  ));
+
+  let auth;
+  try {
+    auth = resolveAuth();
+  } catch (err) {
+    console.error(boldRed(`Error: ${err.message}\n`));
     process.exit(2);
   }
 
   if (ruleFolders.length === 0) {
-    console.log('No rules found under rules/. Nothing to deploy.');
+    console.log(yellow('No rules found under rules/. Nothing to deploy.'));
     process.exit(0);
   }
 
@@ -140,9 +147,9 @@ async function main() {
     validationErrors.push(...validateRuleFolder(folder, schemas));
   }
   if (validationErrors.length > 0) {
-    console.error('✗ Validation failed; not deploying. Fix these errors first:\n');
+    console.error(boldRed('✗ Validation failed; not deploying. Fix these errors first:'));
     for (const error of validationErrors) {
-      console.error(`  ${error}`);
+      console.error(red(`  ${error}`));
     }
     process.exit(2);
   }
@@ -152,7 +159,7 @@ async function main() {
 
   for (const ruleFolder of ruleFolders) {
     const ruleName = path.basename(ruleFolder);
-    console.log(`\n=== Deploying rule: ${ruleName} ===`);
+    console.log(`\n${boldCyan(`=== Deploying rule: ${ruleName} ===`)}`);
 
     let archive;
     try {
@@ -160,7 +167,7 @@ async function main() {
       console.log(`  packaged: ${entries.map((e) => e.name).join(', ')}`);
       archive = await buildTarGz(entries);
     } catch (err) {
-      console.error(`  ✗ failed to package ${ruleName}: ${err.message}`);
+      console.error(red(`  ✗ failed to package ${ruleName}: ${err.message}`));
       failures++;
       continue;
     }
@@ -170,7 +177,7 @@ async function main() {
     try {
       ({ response, text } = await deployRule(auth.baseUrl, auth.authorizationHeader, ruleName, archive));
     } catch (err) {
-      console.error(`Error: failed to reach ${auth.baseUrl}: ${err.message}`);
+      console.error(red(`Error: failed to reach ${auth.baseUrl}: ${err.message}`));
       if (firstRequest) process.exit(2);
       failures++;
       continue;
@@ -178,24 +185,25 @@ async function main() {
     firstRequest = false;
 
     if (isFatalAuthStatus(response.status)) {
-      console.error(`Error: authentication failed (HTTP ${response.status}). Check your credentials.`);
+      console.error(boldRed(`Error: authentication failed (HTTP ${response.status}). Check your credentials.`));
       process.exit(2);
     }
     if (!response.ok) {
-      console.error(`  ✗ HTTP ${response.status}: ${text}`);
+      console.error(red(`  ✗ HTTP ${response.status}: ${text}`));
       failures++;
       continue;
     }
 
-    console.log(`  ✓ deployed`);
+    console.log(green('  ✓ deployed'));
   }
 
-  console.log(`\n${'='.repeat(40)}`);
+  console.log(`\n${'='.repeat(60)}`);
   if (failures > 0) {
-    console.error(`✗ ${failures} of ${ruleFolders.length} rule(s) failed to deploy.`);
+    const noun = failures === 1 ? 'rule' : 'rules';
+    console.error(boldRed(`✗ ${failures} of ${ruleFolders.length} ${noun} failed to deploy.\n`));
     process.exit(1);
   }
-  console.log(`✓ All ${ruleFolders.length} rule(s) deployed.`);
+  console.log(boldGreen(`✓ All ${ruleFolders.length} ${ruleFolders.length === 1 ? 'rule' : 'rules'} deployed.\n`));
   process.exit(0);
 }
 

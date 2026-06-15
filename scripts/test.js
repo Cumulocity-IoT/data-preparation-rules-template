@@ -166,14 +166,6 @@ function indent(text) {
 }
 
 async function main() {
-  let auth;
-  try {
-    auth = resolveAuth();
-  } catch (err) {
-    console.error(boldRed(`Error: ${err.message}\n`));
-    process.exit(2);
-  }
-
   let ruleFolders;
   try {
     ruleFolders = discoverRuleFolders(positionalArgs());
@@ -182,12 +174,20 @@ async function main() {
     process.exit(2);
   }
 
+  process.stdout.write(header(`Running tests for ${ruleFolders.length} rule${ruleFolders.length !== 1 ? 's' : ''}`));
+
   if (ruleFolders.length === 0) {
-    console.log(yellow('No rules found under rules/. Nothing to test.\n'));
+    console.log(yellow('\nNo rules found under rules/. Nothing to test.\n'));
     process.exit(0);
   }
 
-  process.stdout.write(header(`Running tests for ${ruleFolders.length} rule${ruleFolders.length !== 1 ? 's' : ''}`));
+  let auth;
+  try {
+    auth = resolveAuth();
+  } catch (err) {
+    console.error(boldRed(`\nError: ${err.message}\n`));
+    process.exit(2);
+  }
 
   let totalFailures = 0;
   let firstRequest = true;

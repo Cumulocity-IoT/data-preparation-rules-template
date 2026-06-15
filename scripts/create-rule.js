@@ -9,13 +9,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { RULES_DIR } from './lib/rules.js';
+import { green, red, boldRed, boldGreen, header } from './lib/cli-color.js';
 
 // Characters forbidden in a rule name (matches the server-side RuleValidator).
 const FORBIDDEN_CHARS = ['/', '\\', '*', '?', '"', "'", '`', '|', '%', '\0'];
 
 function usage() {
-  console.error('Usage: npm run create-rule -- <rule-name>');
-  console.error('       node scripts/create-rule.js <rule-name>');
+  console.error(red('Usage: npm run create-rule -- <rule-name>'));
+  console.error(red('       node scripts/create-rule.js <rule-name>\n'));
 }
 
 function validateName(name) {
@@ -33,21 +34,23 @@ function validateName(name) {
 
 function main() {
   const name = process.argv[2];
+  console.log(header(name ? `Creating rule: ${name}` : 'Creating rule'));
 
   if (!name) {
+    console.error(boldRed('Error: Failed to create rule.'));
     usage();
     process.exit(1);
   }
 
   const error = validateName(name);
   if (error) {
-    console.error(`Error: ${error}`);
+    console.error(boldRed(`Error: ${error}\n`));
     process.exit(1);
   }
 
   const ruleDir = path.join(RULES_DIR, name);
   if (fs.existsSync(ruleDir)) {
-    console.error(`Error: rule folder already exists: rules/${name}`);
+    console.error(boldRed(`Error: rule folder already exists: rules/${name}\n`));
     process.exit(1);
   }
 
@@ -57,10 +60,10 @@ function main() {
   fs.writeFileSync(path.join(ruleDir, 'smartFunction.ts'), smartFunctionTs(), 'utf-8');
   fs.writeFileSync(path.join(ruleDir, 'tests', 'example.yaml'), exampleTestYaml(), 'utf-8');
 
-  console.log(`✓ Created rule "${name}":`);
-  console.log(`    rules/${name}/data-prep.yaml`);
-  console.log(`    rules/${name}/smartFunction.ts`);
-  console.log(`    rules/${name}/tests/example.yaml`);
+  console.log(boldGreen(`✓ Created rule "${name}":`))
+  console.log(green(`    rules/${name}/data-prep.yaml`));
+  console.log(green(`    rules/${name}/smartFunction.ts`));
+  console.log(green(`    rules/${name}/tests/example.yaml`));
   console.log('\nNext steps:');
   console.log(`  1. Edit rules/${name}/smartFunction.ts to implement onMessage().`);
   console.log(`  2. Adjust the transport/topicPattern in rules/${name}/data-prep.yaml.`);
