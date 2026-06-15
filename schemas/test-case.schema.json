@@ -20,7 +20,8 @@
           "payload",
           "topic",
           "clientID",
-          "time"
+          "time",
+          "payloadFormat"
         ],
         "properties": {
           "payload": {
