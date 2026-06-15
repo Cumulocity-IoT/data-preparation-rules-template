@@ -5,7 +5,7 @@ IDE instead of the Cumulocity UI. Rules transform raw device messages (e.g. MQTT
 payloads) into Cumulocity domain objects — measurements, alarms, events, operations —
 or send messages back to devices.
 
-Rules are authored in **TypeScript** with full type-checking and IntelliSense, and
+Rules are written in **TypeScript** with full type-checking and IntelliSense, and
 bundled to a single ES2023 JavaScript file automatically at test/deploy time.
 
 > For the full feature overview and platform integration details, see the
@@ -23,7 +23,7 @@ npm run deploy -- rules/my-rule                     # 5. deploy to your tenant
 
 ## 1. Prerequisites
 
-- **Node.js 22, 24, or 26** and npm. (`fetch` and the tooling require Node 22+.)
+- **Node.js 22+** and npm.
 - A **Cumulocity tenant** with the Data Preparation microservice subscribed, and a
   user with the `DATA_PREPARATION_RULES_ADMIN` role (plus `DEPLOYMENTS_ADMIN` to deploy).
 - **VS Code** recommended (this repo ships workspace settings and extension
@@ -108,7 +108,7 @@ extension is the test name):
 # rules/my-rule/tests/basic.yaml
 inputs:
   - payload: '{"temperature": 23.5}'
-    payloadFormat: json          # optional; only "json" is supported
+    payloadFormat: json          # only "json" currently supported
     topic: "devices/device01/data"
     clientID: "device01"
     time: "2026-01-01T12:00:00.000Z"
@@ -182,7 +182,7 @@ npm run deploy -- rules/my-rule   # one rule
 ## 10. CI/CD
 
 - **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs `check`, `lint`,
-  and `validate` on Node 22/24/26 for every push and pull request. A manual
+  and `validate` on Node 22+ for every push and pull request. A manual
   `workflow_dispatch` option can additionally run platform tests.
 - **CD** ([`.github/workflows/cd.yml`](.github/workflows/cd.yml)) runs the offline
   checks, then `test` and `deploy`, on manual dispatch or when a release is published.
