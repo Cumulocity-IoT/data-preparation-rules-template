@@ -9,7 +9,7 @@ Rules are written in **TypeScript** with full type-checking and IntelliSense, an
 bundled to a single ES2023 Javascript file automatically at test/deploy time.
 
 > For the full feature overview and platform integration details, see the
-> [Data Preparation product documentation](https://cumulocity-iot-c8y-docs-build-pr-4569.surge.sh/data-preparation/).
+> [Data Preparation product documentation](https://cumulocity.com/docs/data-preparation/).
 
 ## Quick start
 
@@ -29,7 +29,7 @@ npm run deploy -- rules/my-rule                     # 5. deploy to your tenant
 - **VS Code** recommended (this repo ships workspace settings and extension
   recommendations for ESLint and YAML schema validation).
 
-See the [Data Preparation product documentation](https://cumulocity-iot-c8y-docs-build-pr-4569.surge.sh/data-preparation/) for
+See the [Data Preparation product documentation](https://cumulocity.com/docs/data-preparation/) for
 platform setup.
 
 ## 2. Getting started
@@ -80,7 +80,7 @@ The Smart Function runs in a **restricted runtime** — not Node.js, not a brows
 Types come from the [`@c8y/dataprep-types`](https://www.npmjs.com/package/@c8y/dataprep-types)
 package. See the published **[TypeScript API reference (TypeDoc)](https://cumulocity-iot.github.io/data-preparation-rules-template/)**
 and the Smart Function section of the
-[Cumulocity Data Preparation product docs](https://cumulocity-iot-c8y-docs-build-pr-4569.surge.sh/data-preparation/) for the
+[Cumulocity Data Preparation product docs](https://cumulocity.com/docs/data-preparation/) for the
 available types and runtime details.
 
 ## 5. Configuring `data-prep.yaml`
