@@ -23,6 +23,9 @@ function validateName(name) {
   if (!name || name.trim().length === 0) {
     return 'rule name must not be empty';
   }
+  if (name === '.' || name === '..') {
+    return 'rule name must not be "." or ".."';
+  }
   const found = FORBIDDEN_CHARS.filter((c) => name.includes(c));
   if (found.length > 0) {
     // Render forbidden characters unambiguously (show \0 as a label).

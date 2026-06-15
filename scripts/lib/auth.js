@@ -37,7 +37,8 @@ export function resolveAuth() {
   const headerAuth =
     process.env.C8Y_HEADER || process.env.C8Y_HEADER_AUTHORIZATION || readFlag('--header');
   if (headerAuth) {
-    return { baseUrl, authorizationHeader: headerAuth };
+    const authorizationHeader = headerAuth.replace(/^authorization:\s*/i, '').trim();
+    return { baseUrl, authorizationHeader };
   }
 
   const user = process.env.C8Y_USER;
@@ -49,7 +50,7 @@ export function resolveAuth() {
 
   throw new Error(
     'No credentials configured. Provide an Authorization header via C8Y_HEADER ' +
-      '(or C8Y_HEADER_AUTHORIZATION / --header), or set both C8Y_USER and C8Y_PASSWORD for basic auth.',
+    '(or C8Y_HEADER_AUTHORIZATION / --header), or set both C8Y_USER and C8Y_PASSWORD for basic auth.',
   );
 }
 

@@ -227,6 +227,11 @@ async function main() {
     const transportID = config.input.transportID ?? config.input.transport;
     const requestTests = {};
     for (const [name, def] of Object.entries(tests)) {
+      if (!def || !Array.isArray(def.inputs) || def.inputs.length === 0) {
+        console.error(red(`  ✗ invalid test definition "${name}" (missing non-empty "inputs" array)`));
+        totalFailures++;
+        continue;
+      }
       requestTests[name] = {
         inputs: def.inputs.map((input) => ({ transportID, ...input })),
       };
