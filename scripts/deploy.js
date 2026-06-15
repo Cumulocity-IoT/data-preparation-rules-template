@@ -100,16 +100,23 @@ async function packageRule(ruleFolder) {
 
 async function deployRule(baseUrl, authorizationHeader, ruleName, archive) {
   const url = `${baseUrl}/service/dataprep/v1/rules/${encodeURIComponent(ruleName)}/deployed`;
-  const response = await fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/gzip',
-      Authorization: authorizationHeader,
-    },
-    body: archive,
-  });
-  const text = await response.text();
-  return { response, text };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/gzip',
+        Authorization: authorizationHeader,
+      },
+      body: archive,
+      signal: controller.signal,
+    });
+    const text = await response.text();
+    return { response, text };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function main() {

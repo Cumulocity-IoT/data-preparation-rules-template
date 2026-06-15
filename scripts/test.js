@@ -82,16 +82,23 @@ jsonDiff.tokenize = (str) =>
 
 async function runTests(baseUrl, authorizationHeader, body) {
   const url = `${baseUrl}${RUN_TESTS_PATH}`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authorizationHeader,
-    },
-    body: JSON.stringify(body),
-  });
-  const text = await response.text();
-  return { response, text };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: authorizationHeader,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    const text = await response.text();
+    return { response, text };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 /** Evaluate one rule's results. Returns the number of failed test inputs. */
