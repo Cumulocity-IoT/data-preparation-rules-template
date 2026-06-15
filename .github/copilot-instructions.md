@@ -5,7 +5,7 @@ The authoritative, tool-agnostic guidance for this repository lives in
 
 Key reminders for Smart Function (`rules/**/smartFunction.ts`) code:
 
-- The runtime is a **restricted JavaScript sandbox** — not Node.js, not a browser.
+- The runtime is a **restricted Javascript sandbox** — not Node.js, not a browser.
   Do **not** use `fetch`, timers (`setTimeout`/`setInterval`), `process`, `Buffer`,
   `require`, `module`, `__dirname`, `__filename`, DOM/browser APIs, `eval`, or
   `new Function`.

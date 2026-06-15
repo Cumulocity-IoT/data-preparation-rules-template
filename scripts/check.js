@@ -5,7 +5,8 @@ import { writeFileSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { discoverRuleFolders } from './lib/rules.js';
-import { boldGreen, red, header } from './lib/cli-color.js';
+import kleur from 'kleur';
+import { header } from './lib/header.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '..');
@@ -21,7 +22,7 @@ function main() {
 	try {
 		ruleFolders = discoverRuleFolders(args);
 	} catch (err) {
-		console.error(red(`Error: ${err.message}`));
+		console.error(kleur.red(`Error: ${err.message}`));
 		process.exit(1);
 	}
 
@@ -55,7 +56,7 @@ function main() {
 	}
 
 	if (result.error) {
-		console.error(red(`✗ Failed to run tsc: ${result.error.message}\n`));
+		console.error(kleur.red(`✗ Failed to run tsc: ${result.error.message}\n`));
 		process.exit(1);
 	}
 
@@ -63,7 +64,7 @@ function main() {
 		process.exit(result.status ?? 1);
 	}
 
-	console.log(boldGreen('✓ Type check passed.\n'));
+	console.log(kleur.bold().green('✓ Type check passed.\n'));
 	process.exit(0);
 }
 

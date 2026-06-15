@@ -1,6 +1,6 @@
 // ESLint flat config for Data Preparation rule source.
 //
-// Smart Functions run in a restricted JavaScript environment that is *not*
+// Smart Functions run in a restricted Javascript environment that is *not*
 // Node.js and *not* a browser. Only ES2023 language built-ins plus a small set
 // of platform-provided globals (`console`, `TextDecoder`, `TextEncoder`) are
 // available. This config flags the most common globals that developers reach

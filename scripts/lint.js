@@ -3,7 +3,8 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { discoverRuleFolders } from './lib/rules.js';
-import { boldGreen, red, header } from './lib/cli-color.js';
+import kleur from 'kleur';
+import { header } from './lib/header.js';
 
 function ruleLabel(ruleFolders) {
 	if (ruleFolders.length === 1) return `for ${path.basename(ruleFolders[0])}`;
@@ -16,7 +17,7 @@ function main() {
 	try {
 		ruleFolders = discoverRuleFolders(args);
 	} catch (err) {
-		console.error(red(`Error: ${err.message}`));
+		console.error(kleur.red(`Error: ${err.message}`));
 		process.exit(1);
 	}
 
@@ -29,7 +30,7 @@ function main() {
 	});
 
 	if (result.error) {
-		console.error(red(`\n✗ Failed to run ESLint: ${result.error.message}\n`));
+		console.error(kleur.red(`\n✗ Failed to run ESLint: ${result.error.message}\n`));
 		process.exit(1);
 	}
 
@@ -37,7 +38,7 @@ function main() {
 		process.exit(result.status ?? 1);
 	}
 
-	console.log(boldGreen('\n✓ ESLint passed.\n'));
+	console.log(kleur.bold().green('\n✓ ESLint passed.\n'));
 	process.exit(0);
 }
 

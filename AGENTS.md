@@ -13,7 +13,7 @@ IDE instead of the Cumulocity UI. Each rule transforms raw device messages
 events, operations) — or sends messages back to devices.
 
 Rules are written in **TypeScript** for full type-checking and IntelliSense, then
-bundled to a single ES2023 JavaScript file at deploy/test time.
+bundled to a single ES2023 Javascript file at deploy/test time.
 
 ## Repository layout
 
@@ -29,7 +29,7 @@ scripts/                      # validate / create-rule / test / deploy automatio
 
 ## The Smart Function runtime (CRITICAL for correct rule code)
 
-The runtime executing `onMessage` is a **restricted JavaScript sandbox**. It is
+The runtime executing `onMessage` is a **restricted Javascript sandbox**. It is
 **not** Node.js and **not** a browser.
 
 **Available:**

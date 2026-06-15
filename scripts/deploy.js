@@ -26,7 +26,8 @@ import {
   validateRuleFolder,
 } from './lib/rules.js';
 import { sourcePathFor, bundleRule, deployedJsName } from './lib/bundle.js';
-import { green, red, boldRed, yellow, boldGreen, boldCyan, header } from './lib/cli-color.js';
+import kleur from 'kleur';
+import { header } from './lib/header.js';
 
 /** Parse CLI positionals, skipping the `--host`/`--header` value flags. */
 function positionalArgs() {
@@ -124,7 +125,7 @@ async function main() {
   try {
     ruleFolders = discoverRuleFolders(positionalArgs());
   } catch (err) {
-    console.error(boldRed(`Error: ${err.message}\n`));
+    console.error(kleur.bold().red(`Error: ${err.message}\n`));
     process.exit(2);
   }
 
@@ -138,12 +139,12 @@ async function main() {
   try {
     auth = resolveAuth();
   } catch (err) {
-    console.error(boldRed(`Error: ${err.message}\n`));
+    console.error(kleur.bold().red(`Error: ${err.message}\n`));
     process.exit(2);
   }
 
   if (ruleFolders.length === 0) {
-    console.log(yellow('No rules found under rules/. Nothing to deploy.'));
+    console.log(kleur.yellow('No rules found under rules/. Nothing to deploy.'));
     process.exit(0);
   }
 
@@ -154,9 +155,9 @@ async function main() {
     validationErrors.push(...validateRuleFolder(folder, schemas));
   }
   if (validationErrors.length > 0) {
-    console.error(boldRed('✗ Validation failed; not deploying. Fix these errors first:'));
+    console.error(kleur.bold().red('✗ Validation failed; not deploying. Fix these errors first:'));
     for (const error of validationErrors) {
-      console.error(red(`  ${error}`));
+      console.error(kleur.red(`  ${error}`));
     }
     process.exit(2);
   }
@@ -166,7 +167,7 @@ async function main() {
 
   for (const ruleFolder of ruleFolders) {
     const ruleName = path.basename(ruleFolder);
-    console.log(`\n${boldCyan(`=== Deploying rule: ${ruleName} ===`)}`);
+    console.log(`\n${kleur.bold().cyan(`=== Deploying rule: ${ruleName} ===`)}`);
 
     let archive;
     try {
@@ -174,7 +175,7 @@ async function main() {
       console.log(`  packaged: ${entries.map((e) => e.name).join(', ')}`);
       archive = await buildTarGz(entries);
     } catch (err) {
-      console.error(red(`  ✗ failed to package ${ruleName}: ${err.message}`));
+      console.error(kleur.red(`  ✗ failed to package ${ruleName}: ${err.message}`));
       failures++;
       continue;
     }
@@ -184,7 +185,7 @@ async function main() {
     try {
       ({ response, text } = await deployRule(auth.baseUrl, auth.authorizationHeader, ruleName, archive));
     } catch (err) {
-      console.error(red(`Error: failed to reach ${auth.baseUrl}: ${err.message}`));
+      console.error(kleur.red(`Error: failed to reach ${auth.baseUrl}: ${err.message}`));
       if (firstRequest) process.exit(2);
       failures++;
       continue;
@@ -192,25 +193,25 @@ async function main() {
     firstRequest = false;
 
     if (isFatalAuthStatus(response.status)) {
-      console.error(boldRed(`Error: authentication failed (HTTP ${response.status}). Check your credentials.`));
+      console.error(kleur.bold().red(`Error: authentication failed (HTTP ${response.status}). Check your credentials.`));
       process.exit(2);
     }
     if (!response.ok) {
-      console.error(red(`  ✗ HTTP ${response.status}: ${text}`));
+      console.error(kleur.red(`  ✗ HTTP ${response.status}: ${text}`));
       failures++;
       continue;
     }
 
-    console.log(green('  ✓ deployed'));
+    console.log(kleur.green('  ✓ deployed'));
   }
 
   console.log(`\n${'='.repeat(60)}`);
   if (failures > 0) {
     const noun = failures === 1 ? 'rule' : 'rules';
-    console.error(boldRed(`✗ ${failures} of ${ruleFolders.length} ${noun} failed to deploy.\n`));
+    console.error(kleur.bold().red(`✗ ${failures} of ${ruleFolders.length} ${noun} failed to deploy.\n`));
     process.exit(1);
   }
-  console.log(boldGreen(`✓ All ${ruleFolders.length} ${ruleFolders.length === 1 ? 'rule' : 'rules'} deployed.\n`));
+  console.log(kleur.bold().green(`✓ All ${ruleFolders.length} ${ruleFolders.length === 1 ? 'rule' : 'rules'} deployed.\n`));
   process.exit(0);
 }
 

@@ -1,5 +1,5 @@
 {
-  "name": "datapreparation-rules-template",
+  "name": "data-preparation-rules-template",
   "version": "1.0.0",
   "description": "Development template for authoring, validating, testing and deploying Cumulocity Data Preparation rules from an IDE.",
   "type": "module",
@@ -24,6 +24,7 @@
     "diff": "^9.0.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.15.0",
+    "kleur": "^4.1.5",
     "tar": "^7.4.3",
     "typedoc": "^0.27.0",
     "typescript": "^5.7.0",

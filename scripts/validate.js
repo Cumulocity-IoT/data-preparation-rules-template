@@ -10,7 +10,8 @@
 
 import path from 'node:path';
 import { compileSchemas, discoverRuleFolders, validateRuleFolder } from './lib/rules.js';
-import { boldGreen, red, boldRed, yellow, header } from './lib/cli-color.js';
+import kleur from 'kleur';
+import { header } from './lib/header.js';
 
 function main() {
   const args = process.argv.slice(2).filter((a) => !a.startsWith('-'));
@@ -24,7 +25,7 @@ function main() {
   }
 
   if (ruleFolders.length === 0) {
-    console.log(yellow('No rules found under rules/. Nothing to validate.'));
+    console.log(kleur.yellow('No rules found under rules/. Nothing to validate.'));
     process.exit(0);
   }
 
@@ -43,15 +44,15 @@ function main() {
   }
 
   if (allErrors.length > 0) {
-    console.error(boldRed(`✗ Validation failed with ${allErrors.length} error(s):\n`));
+    console.error(kleur.bold().red(`✗ Validation failed with ${allErrors.length} error(s):\n`));
     for (const error of allErrors) {
-      console.error(red(`  ${error}`));
+      console.error(kleur.red(`  ${error}`));
     }
     console.error();
     process.exit(1);
   }
 
-  console.log(boldGreen(`✓ Schema validation passed.\n`));
+  console.log(kleur.bold().green(`✓ Schema validation passed.\n`));
   process.exit(0);
 }
 

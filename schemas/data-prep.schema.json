@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/Cumulocity-IoT/datapreparation-rules-template/schemas/data-prep.schema.json",
+  "$id": "https://github.com/Cumulocity-IoT/data-preparation-rules-template/schemas/data-prep.schema.json",
   "title": "Data Preparation rule configuration",
   "description": "Schema for rules/<rule-name>/data-prep.yaml",
   "type": "object",
