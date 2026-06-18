@@ -18,7 +18,7 @@
     "docs": "typedoc"
   },
   "devDependencies": {
-    "@c8y/dataprep-types": "file:./dataprep",
+    "@c8y/dataprep-types": "^1.0.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "ajv": "^8.17.1",
     "diff": "^9.0.0",
