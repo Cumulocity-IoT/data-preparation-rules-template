@@ -15,7 +15,7 @@ bundled to a single ES2023 Javascript file automatically at test/deploy time.
 
 ```bash
 npm install                                         # 1. install tooling
-npm run create-rule -- my-rule                      # 2. scaffold a new rule
+npm run create-rule -- my-rule                      # 2. create a new rule using template
 npm run check && npm run lint && npm run validate   # 3. offline checks
 npm run test  -- rules/my-rule                      # 4. run platform tests (needs credentials)
 npm run deploy -- rules/my-rule                     # 5. deploy to your tenant
@@ -108,7 +108,7 @@ extension is the test name):
 # rules/my-rule/tests/basic.yaml
 inputs:
   - payload: '{"temperature": 23.5}'
-    payloadFormat: json          # only "json" currently supported
+    payloadFormat: json
     topic: "devices/device01/data"
     clientID: "device01"
     time: "2026-01-01T12:00:00.000Z"
@@ -213,7 +213,6 @@ rules/<rule-name>/        one folder per rule (folder name = rule name)
   data-prep.yaml          rule configuration
   smartFunction.ts        the onMessage implementation
   tests/<name>.yaml       platform test cases
-dataprep/dataprep.ts      vendored copy of the @c8y/dataprep-types declarations
 schemas/                  JSON Schemas used by `npm run validate` and the YAML editor
 scripts/                  validate / create-rule / test / deploy automation
 ```

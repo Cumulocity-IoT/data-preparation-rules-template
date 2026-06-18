@@ -22,7 +22,6 @@ rules/<rule-name>/            # one folder per rule; folder name = rule name on 
   data-prep.yaml              # rule configuration (transport, topic, metadata)
   smartFunction.ts            # the rule logic — exports onMessage()
   tests/<name>.yaml           # platform test cases (one named test per file)
-dataprep/dataprep.ts          # vendored copy of the @c8y/dataprep-types declarations
 schemas/                      # JSON Schemas for offline validation of the YAML files
 scripts/                      # validate / create-rule / test / deploy automation (Node ESM)
 ```
