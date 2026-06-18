@@ -79,7 +79,7 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
 | `disabled` | boolean | no | Deploy as disabled (default `false`). |
 
 Test files (`tests/<name>.yaml`): an `inputs` array (each item: `payload`, `topic`,
-`clientID`, `time` required strings; `payloadFormat: json`), and an
+`clientID`, `time` required strings; `payloadFormat: json | base64 | text`), and an
 optional `expectedOutput` array compared element-by-element when present.
 
 The authoritative schemas live in `schemas/data-prep.schema.json` and

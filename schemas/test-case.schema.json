@@ -26,7 +26,7 @@
         "properties": {
           "payload": {
             "type": "string",
-            "description": "Message payload, encoded per payloadFormat."
+            "description": "Message payload in the format specified by 'payloadFormat'."
           },
           "topic": {
             "type": "string",
@@ -45,9 +45,11 @@
           "payloadFormat": {
             "type": "string",
             "enum": [
-              "json"
+              "json",
+              "base64",
+              "text"
             ],
-            "description": "Payload encoding. Only \"json\" is currently supported."
+            "description": "Payload encoding. Supported options are \"json\", \"base64\", or \"text\"."
           }
         }
       }
