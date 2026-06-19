@@ -11,7 +11,8 @@
     "deploy": "tsc --noEmit && node scripts/deploy.js"
   },
   "devDependencies": {
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "@c8y/dataprep-types": "^1.0.2"
   },
   "dependencies": {
     "js-yaml": "^4.1.1"
