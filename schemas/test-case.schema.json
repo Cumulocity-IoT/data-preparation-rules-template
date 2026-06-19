@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Cumulocity-IoT/data-preparation-rules-template/schemas/test-case.schema.json",
+  "title": "Data Preparation rule test case",
+  "description": "Schema for rules/<rule-name>/tests/<name>.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "inputs"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One or more device messages used as input to the rule.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "payload",
+          "topic",
+          "clientID",
+          "time",
+          "payloadFormat"
+        ],
+        "properties": {
+          "payload": {
+            "type": "string",
+            "description": "Message payload in the format specified by 'payloadFormat'."
+          },
+          "topic": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Non-empty transport topic string."
+          },
+          "clientID": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Non-empty device client ID."
+          },
+          "time": {
+            "type": "string",
+            "description": "ISO 8601 datetime, e.g. 2025-06-15T10:30:00.000Z."
+          },
+          "payloadFormat": {
+            "type": "string",
+            "enum": [
+              "json",
+              "base64",
+              "text"
+            ],
+            "description": "Payload encoding. Supported options are \"json\", \"base64\", or \"text\"."
+          }
+        }
+      }
+    },
+    "expectedOutput": {
+      "type": "array",
+      "description": "Optional expected Cumulocity outputs. If present, actual outputs are compared element-by-element.",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

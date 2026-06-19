@@ -1,6 +1,0 @@
-inputs:
-  - payload: '{"battery": 3}'
-    payloadFormat: json
-    topic: "devices/sensor01/status"
-    clientID: "sensor01"
-    time: "2026-01-01T12:00:00Z"

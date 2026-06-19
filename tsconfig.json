@@ -1,11 +1,18 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "ES2021",
-    "noEmit": true,
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": [
+      "ES2023"
+    ],
     "strict": true,
+    "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "bundler"
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
   },
-  "include": ["rules/**/*.ts", "dataprep"]
+  "include": [
+    "rules/**/*.ts"
+  ]
 }

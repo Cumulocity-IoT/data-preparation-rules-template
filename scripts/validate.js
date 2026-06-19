@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+
+// Offline validation of all rule folders against the JSON Schemas.
+//
+// Usage:
+//   node scripts/validate.js                 # validate every rule under rules/
+//   node scripts/validate.js rules/my-rule   # validate specific rule folder(s)
+//
+// Exits non-zero if any validation error is found.
+
+import path from 'node:path';
+import { compileSchemas, discoverRuleFolders, validateRuleFolder } from './lib/rules.js';
+import kleur from 'kleur';
+import { header } from './lib/header.js';
+
+function main() {
+  const args = process.argv.slice(2).filter((a) => !a.startsWith('-'));
+
+  let ruleFolders;
+  try {
+    ruleFolders = discoverRuleFolders(args);
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
+
+  if (ruleFolders.length === 0) {
+    console.log(kleur.yellow('No rules found under rules/. Nothing to validate.'));
+    process.exit(0);
+  }
+
+  console.log(header(
+    ruleFolders.length === 1
+      ? `Running schema validation for ${path.basename(ruleFolders[0])}`
+      : `Running schema validation for ${ruleFolders.length} rules`,
+  ));
+
+  const schemas = compileSchemas();
+  const allErrors = [];
+
+  for (const folder of ruleFolders) {
+    const errors = validateRuleFolder(folder, schemas);
+    allErrors.push(...errors);
+  }
+
+  if (allErrors.length > 0) {
+    console.error(kleur.bold().red(`✗ Validation failed with ${allErrors.length} error(s):\n`));
+    for (const error of allErrors) {
+      console.error(kleur.red(`  ${error}`));
+    }
+    console.error();
+    process.exit(1);
+  }
+
+  console.log(kleur.bold().green(`✓ Schema validation passed.\n`));
+  process.exit(0);
+}
+
+main();
