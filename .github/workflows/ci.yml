@@ -19,7 +19,7 @@ jobs:
       matrix:
         node-version: ["22", "24", "26"]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
@@ -35,7 +35,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_platform_tests }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
