@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_platform_tests:
+        description: "Also run platform tests against the configured tenant (requires secrets)"
+        type: boolean
+        default: false
+
+jobs:
+  check:
+    name: Offline checks (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["22", "24", "26"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run lint
+      - run: npm run validate
+
+  platform-tests:
+    name: Platform tests (manual)
+    # Only when explicitly requested via workflow_dispatch.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_platform_tests }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run test
+        env:
+          C8Y_HOST: ${{ secrets.C8Y_HOST }}
+          C8Y_HEADER_AUTHORIZATION: ${{ secrets.C8Y_HEADER_AUTHORIZATION }}
+          C8Y_BASEURL: ${{ secrets.C8Y_BASEURL }}
+          C8Y_USER: ${{ secrets.C8Y_USER }}
+          C8Y_PASSWORD: ${{ secrets.C8Y_PASSWORD }}

@@ -1,0 +1,10 @@
+# Payload contains only fields the rule does not recognise. The rule should
+# handle this gracefully: produce no outputs (and log a warning) rather than error.
+inputs:
+  - payload: '{"voltage": 3.3}'
+    payloadFormat: json
+    topic: "devices/sensor01/data"
+    clientID: "sensor01"
+    time: "2026-01-01T12:00:00.000Z"
+
+expectedOutput: []
