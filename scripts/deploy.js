@@ -207,11 +207,13 @@ async function main() {
 
   console.log(`\n${'='.repeat(60)}`);
   if (failures > 0) {
-    const noun = failures === 1 ? 'rule' : 'rules';
-    console.error(kleur.bold().red(`✗ ${failures} of ${ruleFolders.length} ${noun} failed to deploy.\n`));
+    const message = ruleFolders.length === 1
+      ? 'Rule failed to deploy.'
+      : `${failures} of ${ruleFolders.length} rules failed to deploy.`;
+    console.error(kleur.bold().red(`✗ ${message}\n`));
     process.exit(1);
   }
-  console.log(kleur.bold().green(`✓ All ${ruleFolders.length} ${ruleFolders.length === 1 ? 'rule' : 'rules'} deployed.\n`));
+  console.log(kleur.bold().green(`✓ ${ruleFolders.length} ${ruleFolders.length === 1 ? 'rule' : 'rules'} deployed.\n`));
   process.exit(0);
 }
 
