@@ -22,13 +22,13 @@
     "@jridgewell/trace-mapping": "^0.3.25",
     "ajv": "^8.17.1",
     "diff": "^9.0.0",
-    "esbuild": "^0.24.0",
-    "eslint": "^9.15.0",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.5.0",
     "kleur": "^4.1.5",
     "tar": "^7.4.3",
-    "typedoc": "^0.27.0",
-    "typescript": "^5.7.0",
-    "typescript-eslint": "^8.16.0",
+    "typedoc": "^0.28.19",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
     "yaml": "^2.6.0"
   }
 }
