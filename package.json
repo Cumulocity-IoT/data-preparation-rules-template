@@ -18,11 +18,11 @@
     "docs": "typedoc"
   },
   "devDependencies": {
-    "@c8y/dataprep-types": "^1.0.0",
+    "@c8y/dataprep-types": "^1.0.2",
     "@jridgewell/trace-mapping": "^0.3.25",
     "ajv": "^8.17.1",
     "diff": "^9.0.0",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.14.8",
     "eslint": "^9.15.0",
     "kleur": "^4.1.5",
     "tar": "^7.4.3",

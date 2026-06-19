@@ -34,7 +34,7 @@ platform setup.
 
 ## 2. Getting started
 
-1. **Fork or clone** this repository.
+1. Click **Use this template** to create a copy of this repository.
 2. Install dependencies:
    ```bash
    npm install
@@ -157,9 +157,35 @@ Credentials are resolved **token/session first**, with basic auth as a fallback:
 | Authorization header | `C8Y_HEADER`, then `C8Y_HEADER_AUTHORIZATION`, then `--header "Authorization: ..."` |
 | Basic fallback | `C8Y_USER` + `C8Y_PASSWORD` (only if no header is set) |
 
-Because the host/header variables match the [`c8ycli`](https://www.npmjs.com/package/@c8y/cli)
-session environment, an existing `c8ycli` session can be reused without re-entering
-credentials. To avoid storing a password on disk:
+Because the host/header variables match the [`c8y-cli`](https://goc8ycli.netlify.app/docs/installation/)
+session environment, an existing `c8y-cli` session can be reused without re-entering
+credentials.
+
+**Preferred: Authorization header or `c8y-cli` session**
+
+Logging in with `c8ycli` sets `C8Y_HOST` and `C8Y_HEADER` in the 
+shell environment automatically — just run the script directly:
+
+```bash
+# create a new session on first setup
+c8y sessions create
+# activate the session in your current shell
+set-session
+# then run test or deploy
+npm run test
+npm run deploy
+```
+
+Alternatively, set the header or host variables manually:
+
+```bash
+export C8Y_HOST=https://mytenant.cumulocity.com
+export C8Y_HEADER="Bearer <your-token>"
+npm run test
+```
+
+
+**Fallback: Basic auth (avoid storing the password on disk)**
 
 ```bash
 export C8Y_HOST=https://mytenant.cumulocity.com
