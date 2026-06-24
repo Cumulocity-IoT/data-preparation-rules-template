@@ -96,8 +96,8 @@ tags: ["example"]                       # optional
 disabled: false                         # optional (default false)
 ```
 
-The authoritative schema is in [`schemas/data-prep.schema.json`](schemas/data-prep.schema.json).
-With the recommended VS Code YAML extension you get inline validation and completion.
+The authoritative schemas are included in the `@c8y/dataprep-types` package (installed with `npm install`). With the recommended VS Code YAML
+extension you get inline validation and completion.
 
 ## 6. Writing tests
 
@@ -239,8 +239,6 @@ rules/<rule-name>/        one folder per rule (folder name = rule name)
   data-prep.yaml          rule configuration
   smartFunction.ts        the onMessage implementation
   tests/<name>.yaml       platform test cases
-schemas/                  JSON Schemas used by `npm run validate` and the YAML editor
-scripts/                  validate / create-rule / test / deploy automation
 ```
 
 See [`AGENTS.md`](AGENTS.md) for AI-assistant guidance and a concise runtime reference.

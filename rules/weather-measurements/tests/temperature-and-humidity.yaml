@@ -8,27 +8,36 @@ inputs:
     topic: "devices/sensor01/data"
     clientID: "sensor01"
     time: "2026-01-01T12:00:00.000Z"
+  - payload: |
+      {
+        "temperature": 22.0,
+        "humidity": 65
+      }
+    payloadFormat: json
+    topic: "devices/sensor01/data"
+    clientID: "sensor01"
+    time: "2026-01-01T12:00:00.000Z"
 
 expectedOutput:
-  - cumulocityType: measurement
-    externalSource:
-      - externalId: sensor01
-        type: c8y_Serial
-    payload:
-      type: c8y_Weather
-      time: "2026-01-01T12:00:00.000Z"
-      c8y_Temperature:
-        T:
-          value: 22.0
-          unit: "°C"
-  - cumulocityType: measurement
-    externalSource:
-      - externalId: sensor01
-        type: c8y_Serial
-    payload:
-      type: c8y_Weather
-      time: "2026-01-01T12:00:00.000Z"
-      c8y_Humidity:
-        H:
-          value: 65
-          unit: "%"
+  - - cumulocityType: measurement
+      externalSource:
+        - externalId: sensor01
+          type: c8y_Serial
+      payload:
+        type: c8y_Weather
+        time: "2026-01-01T12:00:00.000Z"
+        c8y_Temperature:
+          T:
+            value: 22.0
+            unit: "°C"
+    - cumulocityType: measurement
+      externalSource:
+        - externalId: sensor01
+          type: c8y_Serial
+      payload:
+        type: c8y_Weather
+        time: "2026-01-01T12:00:00.000Z"
+        c8y_Humidity:
+          H:
+            value: 65
+            unit: "%"

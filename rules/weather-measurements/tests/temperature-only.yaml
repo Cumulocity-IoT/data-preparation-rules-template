@@ -9,14 +9,14 @@ inputs:
     time: "2026-01-01T12:00:00.000Z"
 
 expectedOutput:
-  - cumulocityType: measurement
-    externalSource:
-      - externalId: sensor01
-        type: c8y_Serial
-    payload:
-      type: c8y_Weather
-      time: "2026-01-01T12:00:00.000Z"
-      c8y_Temperature:
-        T:
-          value: 25.5
-          unit: "°C"
+  - - cumulocityType: measurement
+      externalSource:
+        - externalId: sensor01
+          type: c8y_Serial
+      payload:
+        type: c8y_Weather
+        time: "2026-01-01T12:00:00.000Z"
+        c8y_Temperature:
+          T:
+            value: 25.5
+            unit: "°C"
