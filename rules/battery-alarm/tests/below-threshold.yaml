@@ -1,5 +1,8 @@
 inputs:
-  - payload: '{"battery": 15}'
+  - payload: |
+      {
+        "battery": 15
+      }
     payloadFormat: json
     topic: "devices/sensor01/status"
     clientID: "sensor01"

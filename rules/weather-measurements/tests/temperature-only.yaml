@@ -1,5 +1,8 @@
 inputs:
-  - payload: '{"temperature": 25.5}'
+  - payload: |
+      {
+        "temperature": 25.5
+      }
     payloadFormat: json
     topic: "devices/sensor01/data"
     clientID: "sensor01"
