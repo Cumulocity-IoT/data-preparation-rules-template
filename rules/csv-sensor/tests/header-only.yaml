@@ -1,0 +1,11 @@
+# Payload contains only the header row and no data rows.
+# The rule should produce no output.
+inputs:
+  - payload: |-
+      temp|hum
+    payloadFormat: text
+    topic: "sensors/node-01/readings"
+    clientID: "node-01"
+    time: "2026-01-01T12:00:00.000Z"
+
+expectedOutput: []

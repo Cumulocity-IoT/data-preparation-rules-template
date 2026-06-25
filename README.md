@@ -13,6 +13,7 @@ bundled to a single ES2023 Javascript file automatically at test/deploy time.
 
 ## Quick start
 
+
 ```bash
 npm install                                         # 1. install tooling
 npm run create-rule -- my-rule                      # 2. create a new rule using template
@@ -20,6 +21,8 @@ npm run check && npm run lint && npm run validate   # 3. offline checks
 npm run test  -- rules/my-rule                      # 4. run platform tests (needs credentials)
 npm run deploy -- rules/my-rule                     # 5. deploy to your tenant
 ```
+
+> For testing against the platform and deploying, see the [Running tests against the platform](#8-running-tests-against-the-platform) section for credential setup.
 
 ## 1. Prerequisites
 

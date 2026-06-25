@@ -1,3 +1,4 @@
+# Two readings from different devices, each reporting temperature and humidity.
 inputs:
   - payload: |
       {
@@ -10,13 +11,13 @@ inputs:
     time: "2026-01-01T12:00:00.000Z"
   - payload: |
       {
-        "temperature": 22.0,
-        "humidity": 65
+        "temperature": 18.5,
+        "humidity": 72
       }
     payloadFormat: json
-    topic: "devices/sensor01/data"
-    clientID: "sensor01"
-    time: "2026-01-01T12:00:00.000Z"
+    topic: "devices/sensor02/data"
+    clientID: "sensor02"
+    time: "2026-01-01T13:00:00.000Z"
 
 expectedOutput:
   - - cumulocityType: measurement
@@ -40,4 +41,26 @@ expectedOutput:
         c8y_Humidity:
           H:
             value: 65
+            unit: "%"
+  - - cumulocityType: measurement
+      externalSource:
+        - externalId: sensor02
+          type: c8y_Serial
+      payload:
+        type: c8y_Weather
+        time: "2026-01-01T13:00:00.000Z"
+        c8y_Temperature:
+          T:
+            value: 18.5
+            unit: "°C"
+    - cumulocityType: measurement
+      externalSource:
+        - externalId: sensor02
+          type: c8y_Serial
+      payload:
+        type: c8y_Weather
+        time: "2026-01-01T13:00:00.000Z"
+        c8y_Humidity:
+          H:
+            value: 72
             unit: "%"
