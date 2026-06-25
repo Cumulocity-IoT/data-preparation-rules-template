@@ -224,9 +224,9 @@ Configure these repository secrets (token-first preferred, basic as fallback):
 | `C8Y_HEADER_AUTHORIZATION` | Authorization header (preferred) |
 | `C8Y_BASEURL`, `C8Y_USER`, `C8Y_PASSWORD` | Basic auth fallback |
 
-## 11. Updating the TypeScript types
+## 11. Updating the TypeScript types, scripts and schemas
 
-The type declarations are published as [`@c8y/dataprep-types`](https://www.npmjs.com/package/@c8y/dataprep-types)
+The type declarations, validation/test/deploy scripts, and schemas are published as [`@c8y/dataprep-types`](https://www.npmjs.com/package/@c8y/dataprep-types)
 and kept up to date here automatically. To pull the latest types manually:
 
 ```bash
