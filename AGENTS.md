@@ -146,7 +146,7 @@ const value = variant.Value;
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
 | `smartFunctionFile` | string | yes | The `.ts` file with `onMessage` (e.g. `smartFunction.ts`). |
-| `input` | object | yes | `transport` (yes), `topicPattern` (yes — use `*` as wildcard, e.g. `sensors/*/temperature`; must not contain `**`; do not use MQTT `+`/`#`), `transportID` (optional — identifier for a specific transport instance; defaults to `transport` if omitted), `clientIDPattern` (optional — `*` as wildcard). |
+| `input` | object | yes | `transport` (yes), `topicPattern` (yes — use `*` as wildcard, e.g. `sensors/*/temperature`; must not contain `**`; do not use MQTT `+`/`#`), `clientIDPattern` (optional — `*` as wildcard). |
 | `description` | string | no | Human-readable description. |
 | `tags` | string[] | no | Organisational tags. |
 | `disabled` | boolean | no | Deploy as disabled (default `false`). |
