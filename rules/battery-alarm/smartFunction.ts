@@ -15,8 +15,9 @@ const LOW_BATTERY_THRESHOLD = 20;
 const CRITICAL_BATTERY_THRESHOLD = 5;
 
 export function onMessage(msg: DeviceMessage, context: DataPrepContext): CumulocityObject[] {
-  const text = new TextDecoder().decode(msg.payload);
-  const data: BatteryPayload = JSON.parse(text);
+  const payload = new TextDecoder().decode(msg.payload);
+  const decoded = Base64.decodeStr(payload);
+  const data: BatteryPayload = JSON.parse(decoded);
 
   if (data.battery == null || data.battery >= LOW_BATTERY_THRESHOLD) {
     return [];
