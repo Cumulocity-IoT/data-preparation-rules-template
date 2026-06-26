@@ -192,3 +192,5 @@ session can be reused without re-entering credentials.
   folders, then edit the generated files.
 - Always run `npm run check`, `npm run lint`, and `npm run validate` before
   proposing a change is complete.
+
+@node_modules/@c8y/dataprep-types/index.d.ts

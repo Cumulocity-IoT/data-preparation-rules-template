@@ -2,8 +2,7 @@
  * Example rule: raises a Cumulocity alarm when a device reports a battery
  * level below a threshold, and produces no output otherwise.
  *
- * Expected incoming payload (JSON text):
- *   { "battery": 15 }
+ * Expected incoming payload (base64-encoded JSON text)
  */
 import type { DeviceMessage, DataPrepContext, CumulocityObject, Alarm } from '@c8y/dataprep-types';
 
