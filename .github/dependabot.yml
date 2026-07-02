@@ -5,10 +5,10 @@ updates:
     schedule:
       interval: "weekly"
     labels:
-      - "auto-approve"
+      - "auto-approve-merge"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     labels:
-      - "auto-approve"
+      - "auto-approve-merge"
