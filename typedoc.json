@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "node_modules/@c8y/dataprep-types/index.d.ts"
+  ],
+  "out": "docs",
+  "name": "Data Preparation Smart Function API",
+  "readme": "none",
+  "githubPages": true
+}

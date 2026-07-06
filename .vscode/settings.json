@@ -1,0 +1,14 @@
+{
+  "yaml.schemas": {
+    "./node_modules/@c8y/dataprep-types/schemas/data-prep.schema.json": "rules/*/data-prep.yaml",
+    "./node_modules/@c8y/dataprep-types/schemas/test-case.schema.json": "rules/*/tests/*.yaml"
+  },
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

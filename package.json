@@ -1,0 +1,27 @@
+{
+  "name": "data-preparation-rules-template",
+  "version": "1.0.0",
+  "description": "Development template for authoring, validating, testing and deploying Cumulocity Data Preparation rules from an IDE.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "dataprep-check",
+    "lint": "dataprep-lint",
+    "validate": "dataprep-validate",
+    "test": "dataprep-test",
+    "deploy": "dataprep-deploy",
+    "create-rule": "dataprep-create-rule",
+    "docs": "typedoc"
+  },
+  "devDependencies": {
+    "@c8y/dataprep-types": "^1.0.3",
+    "eslint": "^10.6.0",
+    "typedoc": "^0.28.19",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1"
+  }
+}
