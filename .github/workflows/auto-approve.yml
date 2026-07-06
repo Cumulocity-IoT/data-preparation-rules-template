@@ -27,4 +27,4 @@ jobs:
       - name: Automatic PR merge
         if: (contains(github.event.pull_request.labels.*.name, 'auto-merge') || contains(github.event.pull_request.labels.*.name, 'auto-approve-merge')) && !github.event.pull_request.draft
         run: |
-          gh pr merge --auto $PR_NUMBER -s
+          gh pr merge --auto $PR_NUMBER -s --repo $GITHUB_REPOSITORY
