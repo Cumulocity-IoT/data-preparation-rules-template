@@ -1,11 +1,11 @@
 # Data Preparation rule configuration.
 
-description: "Converts JSON temperature/humidity payload to Cumulocity measurements"
+description: "Converts pipe-delimited CSV text payloads into Cumulocity measurements"
 disabled: false
 tags:
   - example
-  - weather
+  - csv
 smartFunctionFile: "smartFunction.ts"
 input:
   transport: mqtt
-  topicPattern: "devices/*/data"
+  topicPattern: "sensors/*/readings"

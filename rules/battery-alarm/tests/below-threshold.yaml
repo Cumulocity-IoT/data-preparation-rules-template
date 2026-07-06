@@ -1,17 +1,33 @@
+# Two sequential readings: first MAJOR (15%), then CRITICAL (3%).
+# Payloads are base64-encoded JSON: {"battery": 15} and {"battery": 3}
 inputs:
-  - payload: '{"battery": 15}'
-    payloadFormat: json
+  - payload: eyJiYXR0ZXJ5IjogMTV9
+    payloadFormat: base64
     topic: "devices/sensor01/status"
     clientID: "sensor01"
     time: "2026-01-01T12:00:00.000Z"
+  - payload: eyJiYXR0ZXJ5IjogM30=
+    payloadFormat: base64
+    topic: "devices/sensor01/status"
+    clientID: "sensor01"
+    time: "2026-01-01T12:01:00.000Z"
 
 expectedOutput:
-  - cumulocityType: alarm
-    externalSource:
-      - externalId: sensor01
-        type: c8y_Serial
-    payload:
-      type: c8y_BatteryAlarm
-      text: "Battery level low: 15%"
-      severity: MAJOR
-      time: "2026-01-01T12:00:00.000Z"
+  - - cumulocityType: alarm
+      externalSource:
+        - externalId: sensor01
+          type: c8y_Serial
+      payload:
+        type: c8y_BatteryAlarm
+        text: "Battery level low: 15%"
+        severity: MAJOR
+        time: "2026-01-01T12:00:00.000Z"
+  - - cumulocityType: alarm
+      externalSource:
+        - externalId: sensor01
+          type: c8y_Serial
+      payload:
+        type: c8y_BatteryAlarm
+        text: "Battery level low: 3%"
+        severity: CRITICAL
+        time: "2026-01-01T12:01:00.000Z"

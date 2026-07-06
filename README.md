@@ -13,6 +13,7 @@ bundled to a single ES2023 Javascript file automatically at test/deploy time.
 
 ## Quick start
 
+
 ```bash
 npm install                                         # 1. install tooling
 npm run create-rule -- my-rule                      # 2. create a new rule using template
@@ -20,6 +21,8 @@ npm run check && npm run lint && npm run validate   # 3. offline checks
 npm run test  -- rules/my-rule                      # 4. run platform tests (needs credentials)
 npm run deploy -- rules/my-rule                     # 5. deploy to your tenant
 ```
+
+> For testing against the platform and deploying, see the [Running tests against the platform](#8-running-tests-against-the-platform) section for credential setup.
 
 ## 1. Prerequisites
 
@@ -96,8 +99,8 @@ tags: ["example"]                       # optional
 disabled: false                         # optional (default false)
 ```
 
-The authoritative schema is in [`schemas/data-prep.schema.json`](schemas/data-prep.schema.json).
-With the recommended VS Code YAML extension you get inline validation and completion.
+The authoritative schemas are included in the `@c8y/dataprep-types` package (installed with `npm install`). With the recommended VS Code YAML
+extension you get inline validation and completion.
 
 ## 6. Writing tests
 
@@ -221,9 +224,9 @@ Configure these repository secrets (token-first preferred, basic as fallback):
 | `C8Y_HEADER_AUTHORIZATION` | Authorization header (preferred) |
 | `C8Y_BASEURL`, `C8Y_USER`, `C8Y_PASSWORD` | Basic auth fallback |
 
-## 11. Updating the TypeScript types
+## 11. Updating the TypeScript types, scripts and schemas
 
-The type declarations are published as [`@c8y/dataprep-types`](https://www.npmjs.com/package/@c8y/dataprep-types)
+The type declarations, validation/test/deploy scripts, and schemas are published as [`@c8y/dataprep-types`](https://www.npmjs.com/package/@c8y/dataprep-types)
 and kept up to date here automatically. To pull the latest types manually:
 
 ```bash
@@ -239,8 +242,6 @@ rules/<rule-name>/        one folder per rule (folder name = rule name)
   data-prep.yaml          rule configuration
   smartFunction.ts        the onMessage implementation
   tests/<name>.yaml       platform test cases
-schemas/                  JSON Schemas used by `npm run validate` and the YAML editor
-scripts/                  validate / create-rule / test / deploy automation
 ```
 
 See [`AGENTS.md`](AGENTS.md) for AI-assistant guidance and a concise runtime reference.

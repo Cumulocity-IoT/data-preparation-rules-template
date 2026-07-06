@@ -4,7 +4,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - "auto-approve-merge"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - "auto-approve-merge"

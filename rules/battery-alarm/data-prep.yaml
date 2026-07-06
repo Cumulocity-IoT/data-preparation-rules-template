@@ -9,4 +9,3 @@ smartFunctionFile: "smartFunction.ts"
 input:
   transport: mqtt
   topicPattern: "devices/*/status"
-  clientIDPattern: "*"
