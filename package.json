@@ -18,7 +18,7 @@
     "docs": "typedoc"
   },
   "devDependencies": {
-    "@c8y/dataprep-types": "^1.0.3",
+    "@c8y/dataprep-types": "^1.0.4",
     "eslint": "^10.11.0",
     "typedoc": "^0.28.19",
     "typescript": "^6.0.3",
