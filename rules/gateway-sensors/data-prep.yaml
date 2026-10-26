@@ -1,0 +1,11 @@
+# Data Preparation rule configuration.
+
+description: "Converts JSON temperature payloads a gateway forwards to Cumulocity measurements, creating each new sensor as the gateway's child device"
+disabled: false
+tags:
+  - example
+  - device-creation
+smartFunctionFile: "smartFunction.ts"
+input:
+  transport: mqtt
+  topicPattern: "gateways/*/data"

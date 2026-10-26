@@ -1,0 +1,49 @@
+# A gateway Cumulocity doesn't know yet forwards two sensors' readings: one call creates the gateway
+# and both sensors as its child devices.
+inputs:
+  - payload: '{"sensors": [{"id": "s1", "temperature": 21.5}, {"id": "s2", "temperature": 19}]}'
+    payloadFormat: json
+    topic: "gateways/gw01/data"
+    clientID: "gw01"
+    time: "2026-01-01T12:00:00.000Z"
+
+expectedDeviceCreation:
+  objects:
+    - cumulocityType: device
+      externalSource:
+        - type: c8y_Serial
+          externalId: gw01
+      managedObject:
+        name: Gateway gw01
+        type: acme_Gateway
+        c8y_IsDevice: {}
+        com_cumulocity_model_Agent: {}
+    - cumulocityType: device
+      externalSource:
+        - type: c8y_Serial
+          externalId: s1
+      managedObject:
+        name: Sensor s1
+        type: acme_TemperatureSensor
+        c8y_IsDevice: {}
+        com_cumulocity_model_Agent: {}
+    - cumulocityType: device
+      externalSource:
+        - type: c8y_Serial
+          externalId: s2
+      managedObject:
+        name: Sensor s2
+        type: acme_TemperatureSensor
+        c8y_IsDevice: {}
+        com_cumulocity_model_Agent: {}
+  links:
+    - parent:
+        type: c8y_Serial
+        externalId: gw01
+      child: 1
+      relation: childDevices
+    - parent:
+        type: c8y_Serial
+        externalId: gw01
+      child: 2
+      relation: childDevices

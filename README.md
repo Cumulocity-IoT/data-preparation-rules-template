@@ -60,10 +60,11 @@ must not contain any of these characters:
 
 ## 4. Writing the Smart Function
 
-Each rule exports a single `onMessage` function:
+Each rule exports an `onMessage` function, and optionally an `onDeviceCreate` function:
 
 ```typescript
 import type { DeviceMessage, DataPrepContext, CumulocityObject } from '@c8y/dataprep-types';
+// import type { ExternalId, CreateDevice, CreateAsset, CreateGroup } from '@c8y/dataprep-types';
 
 export function onMessage(msg: DeviceMessage, context: DataPrepContext): (CumulocityObject | DeviceMessage)[] {
   const text = new TextDecoder().decode(msg.payload);
@@ -71,7 +72,18 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
   // ... build outputs ...
   return [];
 }
+
+// export function onDeviceCreate(msg: DeviceMessage, externalId: ExternalId, context: DataPrepContext): (CreateDevice | CreateAsset | CreateGroup)[] {
+//   return [];
+// }
 ```
+
+`onDeviceCreate` is called when an output's external ID has no managed object yet. Without it,
+a basic device is created. With it, the rule decides what is created: a customised device,
+assets, groups and their parents, or nothing (`[]`), which discards the outputs for that ID.
+See the [`site-devices`](rules/site-devices) example rule, which creates a sensor with its own type
+and fragment under new site and region assets, and [`gateway-sensors`](rules/gateway-sensors),
+which creates a gateway and its sensors as child devices in one call.
 
 The Smart Function runs in a **restricted runtime** — not Node.js, not a browser.
 
@@ -89,7 +101,7 @@ available types and runtime details.
 ## 5. Configuring `data-prep.yaml`
 
 ```yaml
-smartFunctionFile: "smartFunction.ts"   # required: file containing onMessage
+smartFunctionFile: "smartFunction.ts"   # required: file containing onMessage (and optionally onDeviceCreate)
 input:                                  # required
   transport: mqtt                       # required (currently only "mqtt")
   topicPattern: "devices/*/data"        # required
@@ -130,10 +142,36 @@ expectedOutput:                  # optional
           unit: "°C"
 ```
 
-A test **passes** if no runtime error occurs. If `expectedOutput` is present, the
-actual outputs must additionally match it element-by-element (canonical JSON). See the
-[`weather-measurements`](rules/weather-measurements) and
+A test **passes** if no runtime error occurs in `onMessage` or `onDeviceCreate`. If
+`expectedOutput` is present, each input's outputs must also match it, element by element and
+in order. See the [`weather-measurements`](rules/weather-measurements) and
 [`battery-alarm`](rules/battery-alarm) example rules.
+
+For a rule with `onDeviceCreate`, a test can also list the objects it is expected to create,
+and the links to their parents (`child` is an index into `objects`, or the child's external ID):
+
+```yaml
+expectedDeviceCreation:          # optional
+  objects:
+    - cumulocityType: device
+      externalSource:
+        - externalId: device01
+          type: c8y_Serial
+      managedObject:             # including the fragments Data Preparation adds
+        name: Sensor device01
+        c8y_IsDevice: {}
+        com_cumulocity_model_Agent: {}
+  links:
+    - parent:
+        externalId: site01
+        type: acme_SiteId
+      child: 0                   # index 0 of objects (device01)
+      relation: childAssets
+```
+
+If `expectedDeviceCreation` is present, the objects that `onDeviceCreate` would create must also match it.
+It covers all the test's inputs together, run in order as consecutive messages. Objects are matched by external ID, so their order in `expectedDeviceCreation` doesn't matter. Tests never actually create anything on the platform. See the [`site-devices`](rules/site-devices)
+and [`gateway-sensors`](rules/gateway-sensors) example rules.
 
 ## 7. Offline validation (no credentials)
 
@@ -240,7 +278,7 @@ npm install @c8y/dataprep-types@latest
 ```
 rules/<rule-name>/        one folder per rule (folder name = rule name)
   data-prep.yaml          rule configuration
-  smartFunction.ts        the onMessage implementation
+  smartFunction.ts        the onMessage, and optionally onDeviceCreate, implementation
   tests/<name>.yaml       platform test cases
 ```
 

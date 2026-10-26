@@ -1,0 +1,24 @@
+# A sensor reporting no site isn't created.
+inputs:
+  - payload: '{"temperature": 21.5}'
+    payloadFormat: json
+    topic: "sites/unknown/temperature"
+    clientID: "sensor03"
+    time: "2026-01-01T12:00:00.000Z"
+
+expectedOutput:
+  - - cumulocityType: measurement
+      externalSource:
+        - type: c8y_Serial
+          externalId: sensor03
+      payload:
+        type: acme_Temperature
+        time: "2026-01-01T12:00:00.000Z"
+        acme_Temperature:
+          T:
+            value: 21.5
+            unit: C
+
+expectedDeviceCreation:
+  objects: []
+  links: []

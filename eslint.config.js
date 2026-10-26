@@ -45,9 +45,9 @@ export default tseslint.config(
     },
     rules: {
       'no-restricted-globals': ['error', ...FORBIDDEN_GLOBALS],
-      // onMessage(msg, context) is a fixed signature; `context` is frequently
-      // unused, so don't flag unused function arguments. Unused local variables
-      // are still flagged (underscore-prefixed names are ignored).
+      // onMessage(msg, context) and onDeviceCreate(msg, externalId, context) have fixed
+      // signatures, often with unused arguments, so don't flag unused function arguments.
+      // Unused local variables are still flagged (underscore-prefixed names are ignored).
       '@typescript-eslint/no-unused-vars': ['error', { args: 'none', varsIgnorePattern: '^_' }],
     },
   },
