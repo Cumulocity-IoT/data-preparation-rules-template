@@ -31,13 +31,13 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): Cumuloc
 
 export function onDeviceCreate(msg: DeviceMessage, externalId: ExternalId, context: DataPrepContext): (CreateDevice | CreateAsset | CreateGroup)[] {
   const data: Reading = JSON.parse(new TextDecoder().decode(msg.payload));
-  if (data.site === undefined) return [];
+  if (typeof data.site !== 'string') return [];
 
   // Parents come before their children
   const created: (CreateDevice | CreateAsset | CreateGroup)[] = [];
   const site: ExternalId = { type: 'acme_SiteId', externalId: data.site.toLowerCase() };
   const siteAsset: CreateAsset = { cumulocityType: 'asset', externalSource: [site], payload: { type: 'acme_Site', name: `Site ${site.externalId}` } };
-  if (data.region !== undefined) {
+  if (typeof data.region === 'string') {
     const region: ExternalId = { type: 'acme_RegionId', externalId: data.region.toLowerCase() };
     created.push({ cumulocityType: 'asset', externalSource: [region], payload: { type: 'acme_Region', name: `Region ${region.externalId}` } });
     siteAsset.parentAssets = [region];

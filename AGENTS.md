@@ -22,7 +22,6 @@ rules/<rule-name>/            # one folder per rule; folder name = rule name on 
   data-prep.yaml              # rule configuration (transport, topic, metadata)
   smartFunction.ts            # the rule logic — exports onMessage(), and optionally onDeviceCreate()
   tests/<name>.yaml           # platform test cases (one named test per file)
-schemas/                      # JSON Schemas for offline validation of the YAML files
 scripts/                      # validate / create-rule / test / deploy automation (Node ESM)
 ```
 
@@ -72,7 +71,7 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
 
 Without it, an output whose external ID has no managed object gets a basic device. A rule
 can also export `onDeviceCreate` to decide what is created; only add it when asked to
-customise device creation:
+customize device creation:
 
 ```typescript
 import type { DeviceMessage, DataPrepContext, ExternalId, CreateDevice, CreateAsset, CreateGroup } from '@c8y/dataprep-types';
@@ -87,6 +86,12 @@ export function onDeviceCreate(msg: DeviceMessage, externalId: ExternalId, conte
   `externalId` it was called with. Parents (`parentDevice`, `parentAssets`) are named by
   external ID, and must already exist or come earlier in the array.
 - Return `[]` to create nothing; the outputs for that ID are discarded.
+- An asset needs a `type`. Only a device can have `parentDevice`. `owner`, if set, must be a
+  user in the tenant.
+- Don't set the marker fragments (`c8y_IsDevice`, `c8y_IsAsset`, `c8y_IsDeviceGroup`); Data
+  Preparation adds them.
+- A thrown error or an invalid result raises a `c8y_DataPrep_DeviceCreateFailure` alarm, and
+  the outputs for that ID are discarded.
 - See `rules/site-devices` (a device with its own type and fragment, under new assets) and
   `rules/gateway-sensors` (a gateway and its child devices in one call) for complete examples,
   with tests using `expectedDeviceCreation`.
@@ -180,8 +185,8 @@ optional `expectedOutput` array compared element-by-element when present, and an
 `expectedDeviceCreation` (`objects` and `links`) compared with what `onDeviceCreate` would
 create for all the inputs, matching objects by external ID.
 
-The authoritative schemas live in `schemas/data-prep.schema.json` and
-`schemas/test-case.schema.json`.
+The authoritative schemas are `schemas/data-prep.schema.json` and `schemas/test-case.schema.json`
+in the `@c8y/dataprep-types` package (`node_modules/@c8y/dataprep-types/schemas/`).
 
 ## npm scripts
 
