@@ -142,9 +142,9 @@ expectedOutput:                  # optional
           unit: "°C"
 ```
 
-A test **passes** if no runtime error occurs in `onMessage` or `onDeviceCreate`, and
-`onDeviceCreate` returns a valid result. If `expectedOutput` is present, each input's outputs
-must also match it, element by element and in order. See the [`weather-measurements`](rules/weather-measurements) and
+A test **passes** if no runtime error occurs in `onMessage` or `onDeviceCreate`. If
+`expectedOutput` is present, each input's outputs must also match it, element by element and
+in order. See the [`weather-measurements`](rules/weather-measurements) and
 [`battery-alarm`](rules/battery-alarm) example rules.
 
 For a rule with `onDeviceCreate`, a test can also list the objects it is expected to create,
