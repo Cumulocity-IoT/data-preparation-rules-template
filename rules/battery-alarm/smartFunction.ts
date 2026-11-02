@@ -2,7 +2,7 @@
  * Example rule: raises a Cumulocity alarm when a device reports a battery
  * level below a threshold, and produces no output otherwise.
  *
- * Expected incoming payload (base64-encoded JSON text)
+ * Expected incoming payload: JSON, e.g. {"battery": 15}
  */
 import type { DeviceMessage, DataPrepContext, CumulocityObject, Alarm } from '@c8y/dataprep-types';
 
@@ -14,9 +14,7 @@ const LOW_BATTERY_THRESHOLD = 20;
 const CRITICAL_BATTERY_THRESHOLD = 5;
 
 export function onMessage(msg: DeviceMessage, context: DataPrepContext): CumulocityObject[] {
-  const payload = new TextDecoder().decode(msg.payload);
-  const decoded = Base64.decodeStr(payload);
-  const data: BatteryPayload = JSON.parse(decoded);
+  const data: BatteryPayload = JSON.parse(new TextDecoder().decode(msg.payload));
 
   if (data.battery == null || data.battery >= LOW_BATTERY_THRESHOLD) {
     return [];
