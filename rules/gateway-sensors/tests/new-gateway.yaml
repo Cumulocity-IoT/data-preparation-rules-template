@@ -16,8 +16,6 @@ expectedDeviceCreation:
       managedObject:
         name: Gateway gw01
         type: acme_Gateway
-        c8y_IsDevice: {}
-        com_cumulocity_model_Agent: {}
     - cumulocityType: device
       externalSource:
         - type: c8y_Serial
@@ -25,8 +23,6 @@ expectedDeviceCreation:
       managedObject:
         name: Sensor s1
         type: acme_TemperatureSensor
-        c8y_IsDevice: {}
-        com_cumulocity_model_Agent: {}
     - cumulocityType: device
       externalSource:
         - type: c8y_Serial
@@ -34,8 +30,6 @@ expectedDeviceCreation:
       managedObject:
         name: Sensor s2
         type: acme_TemperatureSensor
-        c8y_IsDevice: {}
-        com_cumulocity_model_Agent: {}
   links:
     - parent:
         type: c8y_Serial

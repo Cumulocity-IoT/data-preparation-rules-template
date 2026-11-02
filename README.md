@@ -157,10 +157,8 @@ expectedDeviceCreation:          # optional
       externalSource:
         - externalId: device01
           type: c8y_Serial
-      managedObject:             # including the fragments Data Preparation adds
+      managedObject:
         name: Sensor device01
-        c8y_IsDevice: {}
-        com_cumulocity_model_Agent: {}
   links:
     - parent:
         externalId: site01

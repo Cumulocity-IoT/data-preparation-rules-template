@@ -23,8 +23,6 @@ expectedDeviceCreation:
         type: acme_TemperatureSensor
         c8y_Hardware:
           serialNumber: sensor02
-        c8y_IsDevice: {}
-        com_cumulocity_model_Agent: {}
     - cumulocityType: device
       externalSource:
         - type: c8y_Serial
@@ -34,8 +32,6 @@ expectedDeviceCreation:
         type: acme_TemperatureSensor
         c8y_Hardware:
           serialNumber: sensor01
-        c8y_IsDevice: {}
-        com_cumulocity_model_Agent: {}
     - cumulocityType: asset
       externalSource:
         - type: acme_SiteId
@@ -43,8 +39,6 @@ expectedDeviceCreation:
       managedObject:
         type: acme_Site
         name: Site north
-        c8y_IsAsset: {}
-        c8y_IsDeviceGroup: {}
     - cumulocityType: asset
       externalSource:
         - type: acme_RegionId
@@ -52,8 +46,6 @@ expectedDeviceCreation:
       managedObject:
         type: acme_Region
         name: Region east
-        c8y_IsAsset: {}
-        c8y_IsDeviceGroup: {}
   links:
     - parent:
         type: acme_SiteId
