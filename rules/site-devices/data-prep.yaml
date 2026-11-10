@@ -1,0 +1,11 @@
+# Data Preparation rule configuration.
+
+description: "Converts JSON temperature payload to Cumulocity measurements, creating each new sensor under the site it reports"
+disabled: false
+tags:
+  - example
+  - device-creation
+smartFunctionFile: "smartFunction.ts"
+input:
+  transport: mqtt
+  topicPattern: "sites/*/temperature"

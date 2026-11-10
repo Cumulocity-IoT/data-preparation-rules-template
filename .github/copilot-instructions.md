@@ -10,8 +10,9 @@ Key reminders for Smart Function (`rules/**/smartFunction.ts`) code:
   `require`, `module`, `__dirname`, `__filename`, DOM/browser APIs, `eval`, or
   `new Function`.
 - Available globals: ES2023 built-ins plus `console`, `TextDecoder`, `TextEncoder`.
-- Import types from `@c8y/dataprep-types`; export a single `onMessage(msg, context)`
-  returning an array of `CumulocityObject` / `DeviceMessage`.
+- Import types from `@c8y/dataprep-types`; export an `onMessage(msg, context)`
+  returning an array of `CumulocityObject` / `DeviceMessage`, and optionally an
+  `onDeviceCreate(msg, externalId, context)` returning the objects to create.
 - Before finishing, ensure `npm run check`, `npm run lint`, and `npm run validate` pass.
 
 See [`AGENTS.md`](../AGENTS.md) for the full schema, runtime details, and workflow.
