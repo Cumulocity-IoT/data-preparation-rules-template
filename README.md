@@ -111,7 +111,7 @@ When you deploy, the platform decodes `%` followed by two hex digits in a test f
 as a UTF-8 byte, as in a URL. Use this for test names with characters that filenames
 can't contain: `tests/hot%2Fcold.yaml` deploys as the test `hot/cold`. A `%` not followed
 by two hex digits is kept, so `tests/50% off.yaml` deploys as `50% off`. To keep a
-literal `%` before two hex digits, write it as `%25`. Rules exported from the Data
+literal `%` before two hex digits, use its character code `%25`: for example, `tests/100%25Fan.yaml` deploys as `100%Fan`. Rules exported from the Data
 Preparation application name their test files this way.
 
 For example:
