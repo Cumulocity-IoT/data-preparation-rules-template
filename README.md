@@ -139,6 +139,17 @@ expectedOutput:                  # optional
           unit: "°C"
 ```
 
+`payloadFormat` says how `payload` is written; the rule always receives the bytes in `msg.payload`:
+
+| `payloadFormat` | `payload` |
+| --- | --- |
+| `json` | JSON text |
+| `text` | Plain text |
+| `base64` | Binary data, base64-encoded |
+| `binary` | Binary data as hex digits |
+
+`base64` and `binary` payloads reach your rule as raw bytes in a `Uint8Array`, so you do not need to base64-decode `msg.payload` yourself.
+
 A test **passes** if no runtime error occurs. If `expectedOutput` is present, the
 actual outputs must additionally match it element-by-element (canonical JSON). See the
 [`weather-measurements`](rules/weather-measurements) and

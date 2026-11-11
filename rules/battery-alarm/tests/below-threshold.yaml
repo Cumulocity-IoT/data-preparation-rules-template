@@ -1,5 +1,5 @@
 # Two sequential readings: first MAJOR (15%), then CRITICAL (3%).
-# Payloads are base64-encoded JSON: {"battery": 15} and {"battery": 3}
+# Payloads are the bytes of {"battery": 15} and {"battery": 3}, as base64
 inputs:
   - payload: eyJiYXR0ZXJ5IjogMTV9
     payloadFormat: base64
