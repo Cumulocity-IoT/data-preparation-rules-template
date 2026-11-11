@@ -9,7 +9,8 @@ Key reminders for Smart Function (`rules/**/smartFunction.ts`) code:
   Do **not** use `fetch`, timers (`setTimeout`/`setInterval`), `process`, `Buffer`,
   `require`, `module`, `__dirname`, `__filename`, DOM/browser APIs, `eval`, or
   `new Function`.
-- Available globals: ES2023 built-ins plus `console`, `TextDecoder`, `TextEncoder`.
+- Available globals: ES2023 built-ins plus `console`, `TextDecoder`, `TextEncoder`,
+  `Base64`, `OPCUACodec`, and the importable `cbor2.js` and `protobufjs.js`.
 - Import types from `@c8y/dataprep-types`; export a single `onMessage(msg, context)`
   returning an array of `CumulocityObject` / `DeviceMessage`.
 - Before finishing, ensure `npm run check`, `npm run lint`, and `npm run validate` pass.

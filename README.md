@@ -75,8 +75,8 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
 
 The Smart Function runs in a **restricted runtime** — not Node.js, not a browser.
 
-- **Available:** ES2023 built-ins, `console`, `TextDecoder`, `TextEncoder`, and the
-  importable bundled libraries `cbor2.js` and `protobufjs.js`.
+- **Available:** ES2023 built-ins, `console`, `TextDecoder`, `TextEncoder`, `Base64`,
+  `OPCUACodec`, and the importable bundled libraries `cbor2.js` and `protobufjs.js`.
 - **Not available:** `fetch`, timers (`setTimeout`/`setInterval`), `process`, `Buffer`,
   `require`, DOM/browser APIs, `eval`/`new Function`. `npm run lint` flags these.
 
