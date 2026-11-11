@@ -105,7 +105,16 @@ extension you get inline validation and completion.
 ## 6. Writing tests
 
 Each file under a rule's `tests/` folder is one named test case (the filename without
-extension is the test name):
+extension is the test name).
+
+When you deploy, the platform decodes `%` followed by two hex digits in a test filename
+as a UTF-8 byte, as in a URL. Use this for test names with characters that filenames
+can't contain: `tests/hot%2Fcold.yaml` deploys as the test `hot/cold`. A `%` not followed
+by two hex digits is kept, so `tests/50% off.yaml` deploys as `50% off`. To keep a
+literal `%` before two hex digits, use its character code `%25`: for example, `tests/100%25Fan.yaml` deploys as `100%Fan`. Rules exported from the Data
+Preparation application name their test files this way.
+
+For example:
 
 ```yaml
 # rules/my-rule/tests/basic.yaml
