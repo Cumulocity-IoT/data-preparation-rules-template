@@ -161,9 +161,20 @@ const value = variant.Value;
 | `disabled` | boolean | no | Deploy as disabled (default `false`). |
 
 Test files (`tests/<name>.yaml`): an `inputs` array (each item requires `payload`, `topic`,
-`clientID`, `time` and `payloadFormat: json | base64 | text`), and an
+`clientID`, `time` and `payloadFormat`), and an
 optional `expectedOutput` array. When present it has one element per input, and
 each element is itself an array of the outputs expected for that input.
+
+`payloadFormat` only says how `payload` is written in the test file:
+
+| `payloadFormat` | `payload` |
+|-----------------|-----------|
+| `json` | JSON text |
+| `text` | Plain text |
+| `base64` | Binary data, base64-encoded |
+| `binary` | Binary data as hex digits (e.g. `"7b 22 61 22 7d"`) |
+
+`base64` and `binary` payloads reach your rule as raw bytes in a `Uint8Array`, so the rule does not need to base64-decode `msg.payload` itself.
 
 The authoritative schemas are `data-prep.schema.json` and `test-case.schema.json`
 in `node_modules/@c8y/dataprep-types/schemas/`.
