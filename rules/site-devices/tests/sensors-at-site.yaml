@@ -1,0 +1,63 @@
+# Two sensors at one site: the site and its group are expected once, listed after the sensors, with both sensors
+# in the group. The second sensor reports the site's region, so the site, which the first input created, is linked under it.
+inputs:
+  - payload: '{"site": "North", "temperature": 21.5}'
+    payloadFormat: json
+    topic: "sites/north/temperature"
+    clientID: "sensor01"
+    time: "2026-01-01T12:00:00.000Z"
+  - payload: '{"site": "North", "region": "East", "temperature": 19}'
+    payloadFormat: json
+    topic: "sites/north/temperature"
+    clientID: "sensor02"
+    time: "2026-01-01T12:01:00.000Z"
+
+expectedDeviceCreation:
+  objects:
+    - cumulocityType: device
+      externalSource:
+        - type: c8y_Serial
+          externalId: sensor02
+      managedObject:
+        name: Sensor sensor02
+        type: acme_TemperatureSensor
+        c8y_Hardware:
+          serialNumber: sensor02
+    - cumulocityType: device
+      externalSource:
+        - type: c8y_Serial
+          externalId: sensor01
+      managedObject:
+        name: Sensor sensor01
+        type: acme_TemperatureSensor
+        c8y_Hardware:
+          serialNumber: sensor01
+    - cumulocityType: asset
+      externalAssetId: site-north
+      managedObject:
+        type: acme_Site
+        name: Site North
+    - cumulocityType: group
+      path: ["Temperature sensors"]
+      parentAsset: site-north
+      managedObject: {}
+    - cumulocityType: asset
+      externalAssetId: region-east
+      managedObject:
+        type: acme_Region
+        name: Region East
+  links:
+    - parent:
+        path: ["Temperature sensors"]
+        parentAsset: site-north
+      child: 0
+      relation: childAssets
+    - parent:
+        path: ["Temperature sensors"]
+        parentAsset: site-north
+      child: 1
+      relation: childAssets
+    - parent:
+        externalAssetId: region-east
+      child: 2
+      relation: childAssets

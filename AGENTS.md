@@ -20,7 +20,7 @@ bundled to a single ES2023 Javascript file at deploy/test time.
 ```
 rules/<rule-name>/            # one folder per rule; folder name = rule name on the platform
   data-prep.yaml              # rule configuration (transport, topic, metadata)
-  smartFunction.ts            # the rule logic — exports onMessage()
+  smartFunction.ts            # the rule logic — exports onMessage(), and optionally onDeviceCreate()
   tests/<name>.yaml           # platform test cases (one named test per file)
 eslint.config.js              # lint rules flagging globals unavailable in the runtime
 tsconfig.json                 # type-check configuration for rules/**/*.ts
@@ -76,6 +76,48 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
   `Operation`, `ManagedObject`) and/or `DeviceMessage` items. Each `CumulocityObject` must include an
   `externalSource` array identifying the device.
 - Return `[]` to produce no output for a message.
+
+## The optional `onDeviceCreate` function
+
+Without it, an output whose external ID has no managed object gets a basic device. A rule
+can also export `onDeviceCreate` to decide what is created; only add it when asked to
+customize device creation:
+
+```typescript
+import type { DeviceMessage, DataPrepContext, ExternalId, CreateDevice, CreateAsset, CreateGroup } from '@c8y/dataprep-types';
+
+export function onDeviceCreate(msg: DeviceMessage, externalId: ExternalId, context: DataPrepContext): (CreateDevice | CreateAsset | CreateGroup)[] {
+  return [{ cumulocityType: 'device', externalSource: [externalId], payload: { name: `Sensor ${externalId.externalId}` } }];
+}
+```
+
+- Called once per missing external ID, with the message that produced the output.
+- Return `CreateDevice`, `CreateAsset` and `CreateGroup` objects; one must carry the
+  `externalId` it was called with.
+- A parent comes earlier in the array, is returned by another call for the same message, or
+  already exists. A parent device is given as the object itself or its external ID
+  (`parentDevice`); a parent asset as the object itself or its `externalAssetId` string
+  (`parentAssets`). A group can only be given as the object itself, in `parentAssets`, and
+  can't be a `parentDevice`.
+- An asset has one optional ID, `externalAssetId` (its external ID of type `c8y_Asset`), not
+  `externalSource`, and its parents must be assets. `type` is optional.
+- A group has no external IDs: it is named by `path`, an array of group names from the top level,
+  or from its `parentAsset` if the path starts in an asset. It is found, or created if missing.
+  `parentAsset` is an `externalAssetId` string or an asset object that has one. A device joins a
+  group by giving the group object in `parentAssets`.
+- A group has no `parentAssets`. Its payload can't set `name`, or a `type` other than the one its
+  position gives; either makes the result invalid. If a result returns a path and a longer path
+  starting with it (`['A']` and `['A', 'B']`), the shorter comes first.
+- Return `[]` to create nothing; the outputs for that ID are discarded.
+- Only a device can have `parentDevice`. `owner`, if set, must be a
+  user in the tenant.
+- Don't set the marker fragments (`c8y_IsDevice`, `c8y_IsAsset`, `c8y_IsDeviceGroup`); Data
+  Preparation adds them.
+- A thrown error or an invalid result raises a `c8y_DataPrep_DeviceCreateFailure` alarm, and
+  the outputs for that ID are discarded.
+- See `rules/site-devices` (a device with its own type and fragment, in a group of a new asset) and
+  `rules/gateway-sensors` (a gateway and its child devices in one call) for complete examples,
+  with tests using `expectedDeviceCreation`.
 
 ## Decoding binary payloads (codecs)
 
@@ -154,16 +196,27 @@ const value = variant.Value;
 
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
-| `smartFunctionFile` | string | yes | The `.ts` file with `onMessage` (e.g. `smartFunction.ts`). |
+| `smartFunctionFile` | string | yes | The `.ts` file with `onMessage`, and `onDeviceCreate` if any (e.g. `smartFunction.ts`). |
 | `input` | object | yes | `transport` (yes), `topicPattern` (yes — use `*` as wildcard, e.g. `sensors/*/temperature`; must not contain `**`; do not use MQTT `+`/`#`), `clientIDPattern` (optional — `*` as wildcard). |
 | `description` | string | no | Human-readable description. |
 | `tags` | string[] | no | Organisational tags. |
 | `disabled` | boolean | no | Deploy as disabled (default `false`). |
 
 Test files (`tests/<name>.yaml`): an `inputs` array (each item requires `payload`, `topic`,
-`clientID`, `time` and `payloadFormat: json | base64 | text`), and an
-optional `expectedOutput` array. When present it has one element per input, and
-each element is itself an array of the outputs expected for that input.
+`clientID`, `time` and `payloadFormat: json | base64 | text`), an
+optional `expectedOutput` array, and an optional `expectedDeviceCreation`.
+`expectedOutput`, when present, has one element per input, and each element is itself
+an array of the outputs expected for that input.
+
+`expectedDeviceCreation` (`objects` and `links`) is compared with what `onDeviceCreate`
+would create for all the inputs. Devices and assets are matched by external ID,
+and groups by `path` and `parentAsset`.
+
+- An asset in `links` is `{externalAssetId: <id>}`; a group's `parentAsset` is the `externalAssetId` string.
+- A group parent is `{path, parentAsset}`.
+- An object that an earlier input created is listed once. `child` is an index into `objects`, or for such an object, its reference.
+
+See `rules/site-devices/tests/sensors-at-site.yaml`.
 
 The authoritative schemas are `data-prep.schema.json` and `test-case.schema.json`
 in `node_modules/@c8y/dataprep-types/schemas/`.
