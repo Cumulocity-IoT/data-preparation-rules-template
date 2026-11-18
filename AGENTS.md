@@ -22,8 +22,18 @@ rules/<rule-name>/            # one folder per rule; folder name = rule name on 
   data-prep.yaml              # rule configuration (transport, topic, metadata)
   smartFunction.ts            # the rule logic — exports onMessage(), and optionally onDeviceCreate()
   tests/<name>.yaml           # platform test cases (one named test per file)
-scripts/                      # validate / create-rule / test / deploy automation (Node ESM)
+eslint.config.js              # lint rules flagging globals unavailable in the runtime
+tsconfig.json                 # type-check configuration for rules/**/*.ts
+typedoc.json                  # TypeScript API reference generation (npm run docs)
+.vscode/                      # workspace settings (YAML schema mapping) and extension recommendations
+.github/workflows/            # CI (check, lint, validate) and CD (test, deploy)
 ```
+
+The type declarations, JSON Schemas (`schemas/data-prep.schema.json`,
+`schemas/test-case.schema.json`) and the validate / create-rule / test / deploy
+CLI scripts are not in this repository: they ship in the `@c8y/dataprep-types`
+npm package, under `node_modules/@c8y/dataprep-types/`. The `npm run` scripts are
+thin wrappers around its `dataprep-*` binaries.
 
 ## The Smart Function runtime (CRITICAL for correct rule code)
 
@@ -63,7 +73,7 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
   `new TextDecoder().decode(msg.payload)`); also `topic`, `transportID`, optional
   `clientID`, `time`, `transportFields`.
 - **Output** — an array of `CumulocityObject` (`Measurement`, `Alarm`, `Event`,
-  `Operation`) and/or `DeviceMessage` items. Each `CumulocityObject` must include an
+  `Operation`, `ManagedObject`) and/or `DeviceMessage` items. Each `CumulocityObject` must include an
   `externalSource` array identifying the device.
 - Return `[]` to produce no output for a message.
 
@@ -179,14 +189,16 @@ const value = variant.Value;
 | `tags` | string[] | no | Organisational tags. |
 | `disabled` | boolean | no | Deploy as disabled (default `false`). |
 
-Test files (`tests/<name>.yaml`): an `inputs` array (each item: `payload`, `topic`,
-`clientID`, `time` required strings; `payloadFormat: json | base64 | text`), and an
-optional `expectedOutput` array compared element-by-element when present, and an optional
-`expectedDeviceCreation` (`objects` and `links`) compared with what `onDeviceCreate` would
-create for all the inputs, matching objects by external ID.
+Test files (`tests/<name>.yaml`): an `inputs` array (each item requires `payload`, `topic`,
+`clientID`, `time` and `payloadFormat: json | base64 | text`), an
+optional `expectedOutput` array, and an optional `expectedDeviceCreation`.
+`expectedOutput`, when present, has one element per input, and each element is itself
+an array of the outputs expected for that input. `expectedDeviceCreation` (`objects`
+and `links`) is compared with what `onDeviceCreate` would create for all the inputs,
+matching objects by external ID.
 
-The authoritative schemas are `schemas/data-prep.schema.json` and `schemas/test-case.schema.json`
-in the `@c8y/dataprep-types` package (`node_modules/@c8y/dataprep-types/schemas/`).
+The authoritative schemas are `data-prep.schema.json` and `test-case.schema.json`
+in `node_modules/@c8y/dataprep-types/schemas/`.
 
 ## npm scripts
 
