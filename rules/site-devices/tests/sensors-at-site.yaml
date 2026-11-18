@@ -1,5 +1,5 @@
-# Two sensors at one site: the site is expected once, listed after the sensors, with both linked under it.
-# The second sensor reports the site's region, so the site, which the first input created, is linked under it.
+# Two sensors at one site: the site and its group are expected once, listed after the sensors, with both sensors
+# in the group. The second sensor reports the site's region, so the site, which the first input created, is linked under it.
 inputs:
   - payload: '{"site": "North", "temperature": 21.5}'
     payloadFormat: json
@@ -33,32 +33,31 @@ expectedDeviceCreation:
         c8y_Hardware:
           serialNumber: sensor01
     - cumulocityType: asset
-      externalSource:
-        - type: acme_SiteId
-          externalId: north
+      externalAssetId: site-north
       managedObject:
         type: acme_Site
-        name: Site north
+        name: Site North
+    - cumulocityType: group
+      path: ["Temperature sensors"]
+      parentAsset: site-north
+      managedObject: {}
     - cumulocityType: asset
-      externalSource:
-        - type: acme_RegionId
-          externalId: east
+      externalAssetId: region-east
       managedObject:
         type: acme_Region
-        name: Region east
+        name: Region East
   links:
     - parent:
-        type: acme_SiteId
-        externalId: north
+        path: ["Temperature sensors"]
+        parentAsset: site-north
       child: 0
       relation: childAssets
     - parent:
-        type: acme_SiteId
-        externalId: north
+        path: ["Temperature sensors"]
+        parentAsset: site-north
       child: 1
       relation: childAssets
     - parent:
-        type: acme_RegionId
-        externalId: east
+        externalAssetId: region-east
       child: 2
       relation: childAssets

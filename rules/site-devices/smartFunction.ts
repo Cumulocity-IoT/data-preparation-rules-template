@@ -2,8 +2,9 @@
  * Example rule: records each temperature reading as a measurement, and uses onDeviceCreate to choose
  * what is created for a sensor Cumulocity doesn't know yet.
  *
- * A sensor that reports its site is created under that site's asset, and the site under its region's
- * asset if reported. A sensor that reports no site isn't created, and its readings are discarded.
+ * A sensor that reports its site is created in the site's "Temperature sensors" group, and the site's
+ * asset under its region's asset if reported. A sensor that reports no site isn't created, and its
+ * readings are discarded.
  *
  * Expected incoming payload (JSON text):
  *   { "site": "North", "region": "East", "temperature": 21.5 }   (region optional, site optional)
@@ -33,21 +34,21 @@ export function onDeviceCreate(msg: DeviceMessage, externalId: ExternalId, conte
   const data: Reading = JSON.parse(new TextDecoder().decode(msg.payload));
   if (typeof data.site !== 'string') return [];
 
-  // Parents come before their children
+  // Parents come before their children, and are named as the objects themselves
   const created: (CreateDevice | CreateAsset | CreateGroup)[] = [];
-  const site: ExternalId = { type: 'acme_SiteId', externalId: data.site.toLowerCase() };
-  const siteAsset: CreateAsset = { cumulocityType: 'asset', externalSource: [site], payload: { type: 'acme_Site', name: `Site ${site.externalId}` } };
+  const site: CreateAsset = { cumulocityType: 'asset', externalAssetId: `site-${data.site.toLowerCase()}`, payload: { type: 'acme_Site', name: `Site ${data.site}` } };
   if (typeof data.region === 'string') {
-    const region: ExternalId = { type: 'acme_RegionId', externalId: data.region.toLowerCase() };
-    created.push({ cumulocityType: 'asset', externalSource: [region], payload: { type: 'acme_Region', name: `Region ${region.externalId}` } });
-    siteAsset.parentAssets = [region];
+    const region: CreateAsset = { cumulocityType: 'asset', externalAssetId: `region-${data.region.toLowerCase()}`, payload: { type: 'acme_Region', name: `Region ${data.region}` } };
+    created.push(region);
+    site.parentAssets = [region];
   }
-  created.push(siteAsset);
-  created.push({
+  // Found by its path in the site, or created if missing
+  const sensors: CreateGroup = { cumulocityType: 'group', parentAsset: site, path: ['Temperature sensors'], payload: {} };
+  created.push(site, sensors, {
     cumulocityType: 'device',
     externalSource: [externalId],
     payload: { name: `Sensor ${externalId.externalId}`, type: 'acme_TemperatureSensor', c8y_Hardware: { serialNumber: externalId.externalId } },
-    parentAssets: [site],
+    parentAssets: [sensors],
   });
   return created;
 }

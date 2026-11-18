@@ -1,6 +1,6 @@
 # Data Preparation rule configuration.
 
-description: "Converts JSON temperature payload to Cumulocity measurements, creating each new sensor under the site it reports"
+description: "Converts JSON temperature payload to Cumulocity measurements, creating each new sensor in its site's group"
 disabled: false
 tags:
   - example
