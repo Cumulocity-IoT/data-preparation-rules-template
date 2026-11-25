@@ -79,7 +79,7 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
 
 ## The optional `onDeviceCreate` function
 
-Without it, an output whose external ID has no managed object gets a basic device. A rule
+Without it, an output whose external ID has no managed object gets a default device. A rule
 can also export `onDeviceCreate` to decide what is created; only add it when asked to
 customize device creation:
 
@@ -96,15 +96,21 @@ export function onDeviceCreate(msg: DeviceMessage, externalId: ExternalId, conte
   `externalId` it was called with.
 - A parent comes earlier in the array, is returned by another call for the same message, or
   already exists. A parent device is given as the object itself or its external ID
-  (`parentDevice`); a parent asset as the object itself or its `externalAssetId` string
-  (`parentAssets`). A group can only be given as the object itself, in `parentAssets`, and
-  can't be a `parentDevice`.
-- An asset has one optional ID, `externalAssetId` (its external ID of type `c8y_Asset`), not
+  (`parentDevice`); an existing parent asset as `{ externalAssetId }`, never a bare string
+  (`parentAssets`). A group is given in a device's `parentAssets`, as the object itself or as
+  `{ path, rootAsset? }`, and can't be a `parentDevice`.
+- Each entry in `parentAssets` is a separate direct parent, not a path.
+  Nesting comes from the parents themselves: a group's `path`, or an asset's own `parentAssets`.
+- An asset has one required ID, `externalAssetId` (its external ID of type `c8y_Asset`), not
   `externalSource`, and its parents must be assets. `type` is optional.
-- A group has no external IDs: it is named by `path`, an array of group names from the top level,
-  or from its `parentAsset` if the path starts in an asset. It is found, or created if missing.
-  `parentAsset` is an `externalAssetId` string or an asset object that has one. A device joins a
-  group by giving the group object in `parentAssets`.
+- A group has no external IDs: it is named by `{ path, rootAsset? }`, where `path` is an array of
+  group names from the top level, or from `rootAsset` if the path starts in an asset. A
+  `CreateGroup` has it as `groupPath`, and is found, or created if missing. In `parentAssets`,
+  `{ path, rootAsset? }` names an existing group, or one a `CreateGroup` earlier in the array or
+  another call for the same message returns; it is never created itself. An asset object as
+  `rootAsset` must be earlier in the array.
+  `rootAsset` is an existing asset's `{ externalAssetId }` or an asset object. A device joins a
+  group in its `parentAssets`; an asset can't be in a group.
 - A group has no `parentAssets`. Its payload can't set `name`, or a `type` other than the one its
   position gives; either makes the result invalid. If a result returns a path and a longer path
   starting with it (`['A']` and `['A', 'B']`), the shorter comes first.
@@ -210,11 +216,17 @@ an array of the outputs expected for that input.
 
 `expectedDeviceCreation` (`objects` and `links`) is compared with what `onDeviceCreate`
 would create for all the inputs. Devices and assets are matched by external ID,
-and groups by `path` and `parentAsset`.
+and groups by `path` and `rootAsset`. The order of objects and links doesn't matter.
 
-- An asset in `links` is `{externalAssetId: <id>}`; a group's `parentAsset` is the `externalAssetId` string.
-- A group parent is `{path, parentAsset}`.
-- An object that an earlier input created is listed once. `child` is an index into `objects`, or for such an object, its reference.
+- Each link is `child` then `parent`. Name both by reference, not by position: a device by
+  its external ID (`{type, externalId}`), an asset by `{externalAssetId: <id>}`, and a group
+  parent by `{path, rootAsset}`, where `rootAsset` is `{externalAssetId: <id>}`.
+- A parent can instead be its index in `objects`. Use a reference where there is one; an index
+  can be clearer for a group with a long path.
+- An object that an earlier input created is listed once.
+- `npm run test -- --update-expected` writes each test's `expectedOutput`, and `expectedDeviceCreation`
+  for a rule with `onDeviceCreate`, from what it does; comments inside those sections are lost. Review the
+  result rather than trusting it: it records what the rule does, not what it should do.
 
 See `rules/site-devices/tests/sensors-at-site.yaml`.
 

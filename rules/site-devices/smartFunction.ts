@@ -43,7 +43,7 @@ export function onDeviceCreate(msg: DeviceMessage, externalId: ExternalId, conte
     site.parentAssets = [region];
   }
   // Found by its path in the site, or created if missing
-  const sensors: CreateGroup = { cumulocityType: 'group', parentAsset: site, path: ['Temperature sensors'], payload: {} };
+  const sensors: CreateGroup = { cumulocityType: 'group', groupPath: { rootAsset: site, path: ['Temperature sensors'] }, payload: {} };
   created.push(site, sensors, {
     cumulocityType: 'device',
     externalSource: [externalId],

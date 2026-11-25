@@ -39,7 +39,7 @@ expectedDeviceCreation:
         name: Site North
     - cumulocityType: group
       path: ["Temperature sensors"]
-      parentAsset: site-north
+      rootAsset: { externalAssetId: site-north }
       managedObject: {}
     - cumulocityType: asset
       externalAssetId: region-east
@@ -47,17 +47,9 @@ expectedDeviceCreation:
         type: acme_Region
         name: Region East
   links:
-    - parent:
-        path: ["Temperature sensors"]
-        parentAsset: site-north
-      child: 0
-      relation: childAssets
-    - parent:
-        path: ["Temperature sensors"]
-        parentAsset: site-north
-      child: 1
-      relation: childAssets
-    - parent:
-        externalAssetId: region-east
-      child: 2
-      relation: childAssets
+    - child: { type: c8y_Serial, externalId: sensor02 }
+      parent: { path: ["Temperature sensors"], rootAsset: { externalAssetId: site-north } }
+    - child: { type: c8y_Serial, externalId: sensor01 }
+      parent: { path: ["Temperature sensors"], rootAsset: { externalAssetId: site-north } }
+    - child: { externalAssetId: site-north }
+      parent: { externalAssetId: region-east }

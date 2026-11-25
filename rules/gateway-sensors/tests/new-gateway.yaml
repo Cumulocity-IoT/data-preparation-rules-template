@@ -31,13 +31,7 @@ expectedDeviceCreation:
         name: Sensor s2
         type: acme_TemperatureSensor
   links:
-    - parent:
-        type: c8y_Serial
-        externalId: gw01
-      child: 1
-      relation: childDevices
-    - parent:
-        type: c8y_Serial
-        externalId: gw01
-      child: 2
-      relation: childDevices
+    - child: { type: c8y_Serial, externalId: s1 }
+      parent: { type: c8y_Serial, externalId: gw01 }
+    - child: { type: c8y_Serial, externalId: s2 }
+      parent: { type: c8y_Serial, externalId: gw01 }

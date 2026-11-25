@@ -79,7 +79,7 @@ export function onMessage(msg: DeviceMessage, context: DataPrepContext): (Cumulo
 ```
 
 `onDeviceCreate` is called when an output's external ID has no managed object yet. Without it,
-a basic device is created. With it, the rule decides what is created: a customized device,
+a default device is created. With it, the rule decides what is created: a customized device,
 assets, groups and their parents, or nothing (`[]`), which discards the outputs for that ID.
 See the [`site-devices`](rules/site-devices) example rule, which creates a sensor with its own type
 and fragment in a group of a new site asset, and the site under a region asset if the message gives one, and [`gateway-sensors`](rules/gateway-sensors),
@@ -157,9 +157,10 @@ in order. See the [`weather-measurements`](rules/weather-measurements) and
 [`battery-alarm`](rules/battery-alarm) example rules.
 
 For a rule with `onDeviceCreate`, a test can also list the objects it is expected to create,
-and the links to their parents. A parent or child device is given by its external ID,
-an asset as `{externalAssetId: <id>}`, and a parent group as `path` and `parentAsset`, where `parentAsset`
-is the `externalAssetId`. `child` can also be an index into `objects`:
+and the links to their parents. Each link gives the `child`, then the `parent`, by reference:
+a device by its external ID, an asset as `{externalAssetId: <id>}`, and a group parent as `path` and
+`rootAsset`, where `rootAsset` is `{externalAssetId: <id>}`. A parent can also be its index in `objects`,
+though a reference is clearer where there is one:
 
 ```yaml
 expectedDeviceCreation:          # optional
@@ -172,31 +173,29 @@ expectedDeviceCreation:          # optional
         name: Sensor device01
     - cumulocityType: group
       path: [Sensors]
-      parentAsset: site01        # the existing asset site01
+      rootAsset: { externalAssetId: site01 }   # the existing asset site01
       managedObject: {}
   links:
-    - parent:                    # the existing gateway gateway01
-        externalId: gateway01
-        type: c8y_Serial
-      child: 0                   # index 0 of objects (device01)
-      relation: childDevices
-    - parent:                    # the group
-        path: [Sensors]
-        parentAsset: site01
-      child: 0
-      relation: childAssets
-    - parent:                    # the existing asset line01
-        externalAssetId: line01
-      child: 0
-      relation: childAssets
+    - child: { type: c8y_Serial, externalId: device01 }
+      parent: { type: c8y_Serial, externalId: gateway01 }   # the existing gateway gateway01
+    - child: { type: c8y_Serial, externalId: device01 }
+      parent: { path: [Sensors], rootAsset: { externalAssetId: site01 } }   # the group; or 1, its index in objects
+    - child: { type: c8y_Serial, externalId: device01 }
+      parent: { externalAssetId: line01 }                   # the existing asset line01
 ```
 
 If `expectedDeviceCreation` is present, the objects that `onDeviceCreate` would create must also match it.
 It covers all the test's inputs together, run in order as consecutive messages. Devices and assets are
-matched by external ID, and groups by `path` and `parentAsset`, so their order in `expectedDeviceCreation` doesn't matter.
+matched by external ID, and groups by `path` and `rootAsset`, so the order of objects and links doesn't matter.
+
+To write each test's `expectedOutput`, and `expectedDeviceCreation` for a rule with `onDeviceCreate`, from what it does,
+run `npm run test -- --update-expected` (optionally with a rule folder), then review the change.
+Only those sections change, and comments inside them are lost; the rest of the file is left as it is. For a rule without
+`onDeviceCreate`, any `expectedDeviceCreation` is removed. A test with an error is left unchanged.
 
 Tests never actually create anything on the platform and make no requests: they assume every parent named
-by an ID exists, that no group exists before the test's first input, and don't check that `owner` is a user in the tenant.
+by an ID or by a group path exists, that no group a `CreateGroup` returns exists before the test's first input, and
+don't check that `owner` is a user in the tenant.
 
 See the [`site-devices`](rules/site-devices) and [`gateway-sensors`](rules/gateway-sensors) example rules.
 
@@ -215,6 +214,7 @@ These run in CI on every push and pull request.
 ```bash
 npm run test                    # all rules
 npm run test -- rules/my-rule   # one rule
+npm run test -- --update-expected rules/my-rule   # also write the tests' expectedOutput and expectedDeviceCreation
 ```
 
 Credentials are resolved **token/session first**, with basic auth as a fallback:
