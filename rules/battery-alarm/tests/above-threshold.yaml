@@ -1,8 +1,8 @@
 # Battery level is healthy, so the rule should produce no alarm (no output).
-# Payload is base64-encoded JSON: {"battery": 85}
+# Payload is the bytes of {"battery": 85}, as hex
 inputs:
-  - payload: eyJiYXR0ZXJ5IjogODV9
-    payloadFormat: base64
+  - payload: "7b 22 62 61 74 74 65 72 79 22 3a 20 38 35 7d"
+    payloadFormat: binary
     topic: "devices/sensor01/status"
     clientID: "sensor01"
     time: "2026-01-01T12:00:00.000Z"
