@@ -209,7 +209,7 @@ const value = variant.Value;
 | `disabled` | boolean | no | Deploy as disabled (default `false`). |
 
 Test files (`tests/<name>.yaml`): an `inputs` array (each item requires `payload`, `topic`,
-`clientID`, `time` and `payloadFormat: json | base64 | text`), an
+`clientID`, `time` and `payloadFormat`), an
 optional `expectedOutput` array, and an optional `expectedDeviceCreation`.
 `expectedOutput`, when present, has one element per input, and each element is itself
 an array of the outputs expected for that input.
@@ -229,6 +229,17 @@ and groups by `path` and `rootAsset`. The order of objects and links doesn't mat
   result rather than trusting it: it records what the rule does, not what it should do.
 
 See `rules/site-devices/tests/sensors-at-site.yaml`.
+
+`payloadFormat` only says how `payload` is written in the test file:
+
+| `payloadFormat` | `payload` |
+|-----------------|-----------|
+| `json` | JSON text |
+| `text` | Plain text |
+| `base64` | Binary data, base64-encoded |
+| `binary` | Binary data as hex digits (e.g. `"7b 22 61 22 7d"`) |
+
+`base64` and `binary` payloads reach your rule as raw bytes in a `Uint8Array`, so the rule does not need to base64-decode `msg.payload` itself.
 
 The authoritative schemas are `data-prep.schema.json` and `test-case.schema.json`
 in `node_modules/@c8y/dataprep-types/schemas/`.
